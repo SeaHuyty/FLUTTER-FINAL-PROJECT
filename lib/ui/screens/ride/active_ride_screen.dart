@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/core/utils/app_config.dart';
@@ -86,8 +87,8 @@ class _ActiveRideScreenState extends ConsumerState<ActiveRideScreen> {
     }
 
     if (rideSession.sessionId != null) {
-      await ref
-          .read(rideHistoryViewModelProvider.notifier)
+      await context
+          .read<RideHistoryViewModel>()
           .completeRide(
             sessionId: rideSession.sessionId!,
             returnStationName: _returnStation!.name,

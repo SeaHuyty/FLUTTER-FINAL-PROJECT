@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
@@ -90,8 +91,8 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                           _isStartingRide = true;
                         });
                         try {
-                          final history = await ref
-                              .read(rideHistoryViewModelProvider.notifier)
+                          final history = await context
+                              .read<RideHistoryViewModel>()
                               .startRide(
                                 userId: authUser.uid,
                                 bikeNumber: currentRideSession.bikeNumber,

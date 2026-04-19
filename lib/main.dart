@@ -2,12 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart' as provider;
+import 'package:velo_toulouse_redesign/core/providers/app_providers.dart';
 import 'package:velo_toulouse_redesign/core/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/core/utils/firebase_options.dart';
 import 'package:velo_toulouse_redesign/core/providers/auth_provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/login_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/main_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/splash/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,12 @@ Future<void> main() async {
   if (token.isEmpty) {
     throw Exception('Missing MAPBOX_ACCESS_TOKEN in .env file');
   }
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    provider.MultiProvider(
+      providers: appProviders,
+      child: const ProviderScope(child: MyApp()),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -41,7 +47,7 @@ class AuthWrapper extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     return authState.when(
-      loading: () => const SplashScreen(),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, _) => const LoginScreen(),
       data: (user) => user != null ? const MainScreen() : const LoginScreen(),
     );
