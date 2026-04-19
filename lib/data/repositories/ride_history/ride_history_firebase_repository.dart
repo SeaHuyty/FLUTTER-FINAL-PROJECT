@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:velo_toulouse_redesign/data/dtos/ride_history_dto.dart';
-import 'package:velo_toulouse_redesign/data/models/ride_history_model.dart';
+import 'package:velo_toulouse_redesign/models/ride_history_model.dart';
 import 'package:velo_toulouse_redesign/data/repositories/ride_history/ride_history_repository.dart';
 
 class RideHistoryFirebaseRepository implements RideHistoryRepository {

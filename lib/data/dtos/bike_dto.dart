@@ -1,4 +1,4 @@
-import 'package:velo_toulouse_redesign/data/models/bike_model.dart';
+import 'package:velo_toulouse_redesign/models/bike_model.dart';
 
 class BikeDto {
   static const String plateNumber = 'plate_number';

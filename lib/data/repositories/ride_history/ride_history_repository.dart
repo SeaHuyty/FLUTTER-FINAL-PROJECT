@@ -1,4 +1,4 @@
-import 'package:velo_toulouse_redesign/data/models/ride_history_model.dart';
+import 'package:velo_toulouse_redesign/models/ride_history_model.dart';
 
 abstract class RideHistoryRepository {
   Future<String> createRideHistory(RideHistoryModel history);

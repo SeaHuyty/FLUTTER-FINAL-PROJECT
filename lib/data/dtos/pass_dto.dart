@@ -1,4 +1,4 @@
-import 'package:velo_toulouse_redesign/data/models/pass_model.dart';
+import 'package:velo_toulouse_redesign/models/pass_model.dart';
 
 class PassDto {
   static const String title = 'title';
