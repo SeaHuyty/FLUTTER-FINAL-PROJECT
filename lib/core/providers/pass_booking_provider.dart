@@ -1,19 +1,26 @@
-import 'package:flutter_riverpod/legacy.dart';
-
+import 'package:flutter/foundation.dart';
 import 'package:velo_toulouse_redesign/models/pass_model.dart';
-import '../../data/repositories/passes/pass_repository.dart';
-import '../../data/repositories/passes/pass_repository_firebase.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final selectedPassProvider = StateProvider<PassModel?>((ref) => null);
+class PassBookingProvider extends ChangeNotifier {
+  PassModel? _selectedPass;
+  DateTime? _purchaseDate;
 
-final  purchaseDateProvider = StateProvider<DateTime?>((ref) => null);
+  PassModel? get selectedPass => _selectedPass;
+  DateTime? get purchaseDate => _purchaseDate;
 
-final passRepositoryProvider = Provider<PassRepository>((ref) {
-  return PassRepositoryFirebase();
-});
+  void setSelectedPass(PassModel? pass) {
+    _selectedPass = pass;
+    notifyListeners();
+  }
 
+  void setPurchaseDate(DateTime? date) {
+    _purchaseDate = date;
+    notifyListeners();
+  }
 
-
-
-
+  void clear() {
+    _selectedPass = null;
+    _purchaseDate = null;
+    notifyListeners();
+  }
+}

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:velo_toulouse_redesign/core/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/models/bike_model.dart';
@@ -119,7 +118,3 @@ class StationRepositoryFirebase extends StationRepository {
     await _putBikes(stationId, updated);
   }
 }
-
-final stationRepositoryProvider = Provider<StationRepositoryFirebase>((ref) {
-  return StationRepositoryFirebase();
-});

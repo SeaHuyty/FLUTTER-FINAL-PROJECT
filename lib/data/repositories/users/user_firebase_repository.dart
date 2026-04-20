@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:velo_toulouse_redesign/data/dtos/user_dto.dart';
 import 'package:velo_toulouse_redesign/models/user_model.dart';
 import 'package:velo_toulouse_redesign/data/repositories/users/user_repository.dart';
@@ -58,7 +57,3 @@ class UserFirebaseRepository implements UserRepository {
     await _auth.sendPasswordResetEmail(email: email);
   }
 }
-
-final userRepositoryProvider = Provider<UserRepository>((ref) {
-  return UserFirebaseRepository();
-});

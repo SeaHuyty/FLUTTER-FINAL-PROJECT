@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter/foundation.dart';
 
 class RideSession {
   final String? sessionId;
@@ -52,4 +52,18 @@ class RideSession {
   }
 }
 
-final rideSessionProvider = StateProvider<RideSession?>((ref) => null);
+class RideSessionProvider extends ChangeNotifier {
+  RideSession? _session;
+
+  RideSession? get session => _session;
+
+  void setSession(RideSession? session) {
+    _session = session;
+    notifyListeners();
+  }
+
+  void clear() {
+    _session = null;
+    notifyListeners();
+  }
+}
