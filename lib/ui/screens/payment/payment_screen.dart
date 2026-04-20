@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
-import 'package:velo_toulouse_redesign/ui/screens/passes/viewmodels/pass_viewmodel.dart';
+import 'package:velo_toulouse_redesign/ui/screens/passes/view_model/pass_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/viewmodels/station_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/payment_success_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/widgets/payment_amount_breakdown.dart';

@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
-import 'package:velo_toulouse_redesign/ui/screens/passes/viewmodels/pass_viewmodel.dart';
+import 'package:velo_toulouse_redesign/ui/screens/passes/view_model/pass_view_model.dart';
 import 'package:velo_toulouse_redesign/core/providers/auth_provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/viewmodels/ride_history_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/main_screen.dart';
+import 'package:velo_toulouse_redesign/main_common.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/payment_info_card_widget.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/success_header.dart';

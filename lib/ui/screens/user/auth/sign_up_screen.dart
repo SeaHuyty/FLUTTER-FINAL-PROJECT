@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/models/user.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
-import 'package:velo_toulouse_redesign/ui/screens/main_screen.dart';
+import 'package:velo_toulouse_redesign/main_common.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
 
 class SignUpScreen extends StatefulWidget {

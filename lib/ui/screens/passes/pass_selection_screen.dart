@@ -1,7 +1,7 @@
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment_screen.dart';
 import '../../../core/providers/pass_booking_provider.dart';
-import 'viewmodels/pass_viewmodel.dart';
+import 'view_model/pass_view_model.dart';
 import 'widgets/pass_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
