@@ -1,20 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/models/user_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/main_screen.dart';
 import 'package:velo_toulouse_redesign/ui/shared/display/top_bar/app_bar.dart';
 
-class SignUpScreen extends ConsumerStatefulWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends ConsumerState<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -40,7 +39,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final notifier = ref.read(userViewModelProvider.notifier);
+    final notifier = context.read<UserViewModel>();
     final uid = await notifier.signUp(
       _emailController.text.trim(),
       _passwordController.text,
@@ -62,8 +61,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     if (!mounted) return;
 
-    final state = ref.read(userViewModelProvider);
-    if (state.hasError) return;
+    final state = context.read<UserViewModel>();
+    if (state.hasError) {
+      final message = state.error ?? 'Registration failed';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -73,27 +78,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(userViewModelProvider).isLoading;
-
-    ref.listen(userViewModelProvider, (_, next) {
-      next.whenOrNull(
-        error: (e, _) {
-          final message =
-              (e is FirebaseAuthException && e.code == 'email-already-in-use')
-              ? 'This email is already registered. Please login instead.'
-              : e.toString();
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(message)));
-        },
-      );
-    });
+    final isLoading = context.watch<UserViewModel>().isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: StationAppBar(
-        title: 'Create New Account',
-      ),
+      appBar: StationAppBar(title: 'Create New Account'),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

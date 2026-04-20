@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 
-class ForgotPasswordScreen extends ConsumerStatefulWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() =>
-      _ForgotPasswordScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
@@ -26,9 +25,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await ref
-          .read(userViewModelProvider.notifier)
-          .resetPassword(_emailController.text.trim());
+      await context.read<UserViewModel>().resetPassword(
+        _emailController.text.trim(),
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/forgot_password_screen.dart';
@@ -8,14 +8,14 @@ import 'package:velo_toulouse_redesign/ui/screens/main_screen.dart';
 
 const String appLogoImagePath = 'assets/images/velo_logo.png';
 
-class LoginScreen extends ConsumerStatefulWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -30,14 +30,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    await ref
-        .read(userViewModelProvider.notifier)
-        .login(_emailController.text.trim(), _passwordController.text);
+    await context.read<UserViewModel>().login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
 
     if (!mounted) return;
 
-    final userState = ref.read(userViewModelProvider);
-    if (userState.hasError) return;
+    final userState = context.read<UserViewModel>();
+    if (userState.hasError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid email or password')),
+      );
+      return;
+    }
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -47,17 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userState = ref.watch(userViewModelProvider);
-    final isLoading = userState.isLoading;
-
-    ref.listen(userViewModelProvider, (prev, next) {
-      if (prev?.isLoading != true) return;
-      next.whenOrNull(
-        error: (e, _) => ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
-        ),
-      );
-    });
+    final isLoading = context.watch<UserViewModel>().isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.white,
