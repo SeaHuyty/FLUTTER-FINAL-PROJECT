@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
 import 'package:velo_toulouse_redesign/models/user_model.dart';
@@ -9,12 +9,13 @@ import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/edit_profile
 import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/widgets/user_menu.dart';
 
-class UserProfileScreen extends ConsumerWidget {
+class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final userAsync = ref.watch(userViewModelProvider);
+  Widget build(BuildContext context) {
+    final userViewModel = context.watch<UserViewModel>();
+    final user = userViewModel.user;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -22,101 +23,100 @@ class UserProfileScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         title: Center(child: const Text('Profile')),
       ),
-      body: userAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => const Center(child: Text('Failed to load profile')),
-        data: (user) {
-          if (user == null) {
-            return const Center(child: Text('No profile found'));
-          }
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: user.imageUrl.isNotEmpty
-                            ? NetworkImage(user.imageUrl)
-                            : null,
-                        child: user.imageUrl.isEmpty
-                            ? const Icon(Icons.person, size: 50)
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EditProfileScreen(user: user),
+      body: userViewModel.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : userViewModel.hasError
+          ? const Center(child: Text('Failed to load profile'))
+          : user == null
+          ? const Center(child: Text('No profile found'))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: user.imageUrl.isNotEmpty
+                              ? NetworkImage(user.imageUrl)
+                              : null,
+                          child: user.imageUrl.isEmpty
+                              ? const Icon(Icons.person, size: 50)
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EditProfileScreen(user: user),
+                              ),
                             ),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.edit,
-                              size: 16,
-                              color: Colors.white,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.edit,
+                                size: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      user.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    user.name,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                ),
-                if (user.activePassTitle != null) ...[
+                  if (user.activePassTitle != null) ...[
+                    const SizedBox(height: 24),
+                    _buildPassInfoCard(context, user),
+                  ],
                   const SizedBox(height: 24),
-                  _buildPassInfoCard(context, ref, user),
+                  UserMenu(
+                    onHistory: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RideHistoryScreen(),
+                        ),
+                      );
+                    },
+                    onLogout: () async {
+                      await context.read<UserViewModel>().signOut();
+                      if (!context.mounted) return;
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        (_) => false,
+                      );
+                    },
+                  ),
                 ],
-                const SizedBox(height: 24),
-                UserMenu(
-                  onHistory: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const RideHistoryScreen(),
-                      ),
-                    );
-                  },
-                  onLogout: () async {
-                    await ref.read(userViewModelProvider.notifier).signOut();
-                    if (!context.mounted) return;
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (_) => false,
-                    );
-                  },
-                ),
-              ],
+              ),
             ),
-          );
-        },
-      ),
     );
   }
 
-  Widget _buildPassInfoCard(
-    BuildContext context,
-    WidgetRef ref,
-    UserModel user,
-  ) {
+  Widget _buildPassInfoCard(BuildContext context, UserModel user) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -149,7 +149,7 @@ class UserProfileScreen extends ConsumerWidget {
                 icon: const Icon(Icons.more_vert, color: Colors.white),
                 onSelected: (value) {
                   if (value == 'remove') {
-                    _showRemovePassDialog(context, ref);
+                    _showRemovePassDialog(context);
                   }
                 },
                 itemBuilder: (context) => [
@@ -198,7 +198,7 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showRemovePassDialog(BuildContext context, WidgetRef ref) {
+  void _showRemovePassDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -214,8 +214,10 @@ class UserProfileScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              await ref.read(userViewModelProvider.notifier).removeActivePass();
-              ref.read(selectedPassProvider.notifier).state = null;
+              await context.read<UserViewModel>().removeActivePass();
+
+              if (!context.mounted) return;
+              context.read<PassBookingProvider>().setSelectedPass(null);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Pass removed successfully')),

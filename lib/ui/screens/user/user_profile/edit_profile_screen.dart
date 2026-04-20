@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/models/user_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 
-class EditProfileScreen extends ConsumerStatefulWidget {
+class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key, required this.user});
 
   final UserModel user;
 
   @override
-  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
+class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
@@ -38,21 +38,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    await ref.read(userViewModelProvider.notifier).updateUserProfile(
-          widget.user.copyWith(
-            name: _nameController.text.trim(),
-            phoneNumber: _phoneController.text.trim(),
-            gender: _selectedGender!,
-          ),
-        );
+    await context.read<UserViewModel>().updateUserProfile(
+      widget.user.copyWith(
+        name: _nameController.text.trim(),
+        phoneNumber: _phoneController.text.trim(),
+        gender: _selectedGender!,
+      ),
+    );
 
     if (!mounted) return;
 
-    final state = ref.read(userViewModelProvider);
+    final state = context.read<UserViewModel>();
     if (state.hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update profile')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to update profile')));
       return;
     }
 
@@ -61,7 +61,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(userViewModelProvider).isLoading;
+    final isLoading = context.watch<UserViewModel>().isLoading;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Profile')),
@@ -80,8 +80,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     prefixIcon: Icon(Icons.person_outline),
                     border: OutlineInputBorder(),
                   ),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Name is required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Name is required'
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
