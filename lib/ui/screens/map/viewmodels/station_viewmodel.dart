@@ -1,40 +1,55 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
 import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository_firebase.dart';
 
-class StationViewModel extends AsyncNotifier<List<StationModel>> {
-  @override
-  Future<List<StationModel>> build() async {
-    return fetchStations();
+class StationViewModel extends ChangeNotifier {
+  StationViewModel({StationRepository? repository})
+    : _repository = repository ?? StationRepositoryFirebase() {
+    unawaited(fetchStations());
   }
 
-  Future<List<StationModel>> fetchStations() async {
-    final repository = ref.read(stationRepositoryProvider);
-    return repository.getStations();
+  final StationRepository _repository;
+  List<StationModel> _stations = <StationModel>[];
+  bool _isLoading = false;
+  String? _error;
+
+  List<StationModel> get stations => _stations;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
+  Future<void> fetchStations() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _stations = await _repository.getStations();
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> checkoutBike({
     required String stationId,
     required String bikeNumber,
   }) async {
-    final repository = ref.read(stationRepositoryProvider);
-    await repository.checkoutBike(stationId: stationId, bikeNumber: bikeNumber);
-    ref.invalidateSelf();
+    await _repository.checkoutBike(
+      stationId: stationId,
+      bikeNumber: bikeNumber,
+    );
+    await fetchStations();
   }
 
   Future<void> dockBike({
     required String stationId,
     required String bikeNumber,
   }) async {
-    final repository = ref.read(stationRepositoryProvider);
-    await repository.dockBike(stationId: stationId, bikeNumber: bikeNumber);
-    ref.invalidateSelf();
+    await _repository.dockBike(stationId: stationId, bikeNumber: bikeNumber);
+    await fetchStations();
   }
 }
-
-final stationViewModelProvider =
-    AsyncNotifierProvider<StationViewModel, List<StationModel>>(() {
-      return StationViewModel();
-    });

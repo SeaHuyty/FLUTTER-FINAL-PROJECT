@@ -1,33 +1,75 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velo_toulouse_redesign/core/providers/auth_provider.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:velo_toulouse_redesign/data/dtos/ride_history_dto.dart';
 import 'package:velo_toulouse_redesign/models/ride_history_model.dart';
+import 'package:velo_toulouse_redesign/data/repositories/ride_history/ride_history_repository.dart';
 import 'package:velo_toulouse_redesign/data/repositories/ride_history/ride_history_firebase_repository.dart';
 
-class RideHistoryViewModel extends AsyncNotifier<List<RideHistoryModel>> {
+class RideHistoryViewModel extends ChangeNotifier {
+  RideHistoryViewModel({RideHistoryRepository? repository})
+    : _repository = repository ?? RideHistoryFirebaseRepository();
+
+  final RideHistoryRepository _repository;
+  String? _authUid;
+  List<RideHistoryModel> _rides = <RideHistoryModel>[];
+  bool _isLoading = false;
+  String? _error;
+
+  List<RideHistoryModel> get rides => _rides;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
+  Future<void> onAuthUserChanged(User? authUser) async {
+    final newUid = authUser?.uid;
+    if (_authUid == newUid) return;
+    _authUid = newUid;
+
+    if (_authUid == null) {
+      _rides = <RideHistoryModel>[];
+      _error = null;
+      notifyListeners();
+      return;
+    }
+
+    await fetchHistory();
+  }
+
+  Future<void> fetchHistory() async {
+    if (_authUid == null) {
+      _rides = <RideHistoryModel>[];
+      notifyListeners();
+      return;
+    }
+
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _rides = await _repository.getHistoryForUser(_authUid!);
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   void _upsertLocalHistory(RideHistoryModel history) {
-    final current = state.asData?.value;
-    if (current == null) return;
+    final current = _rides;
 
     final index = current.indexWhere((ride) => ride.id == history.id);
     if (index == -1) {
-      state = AsyncValue.data(<RideHistoryModel>[history, ...current]);
+      _rides = <RideHistoryModel>[history, ...current];
+      notifyListeners();
       return;
     }
 
     final updated = <RideHistoryModel>[...current];
     updated[index] = history;
-    state = AsyncValue.data(updated);
-  }
-
-  @override
-  Future<List<RideHistoryModel>> build() async {
-    final authUser = await ref.watch(authStateProvider.future);
-    if (authUser == null) return <RideHistoryModel>[];
-
-    return ref
-        .read(rideHistoryRepositoryProvider)
-        .getHistoryForUser(authUser.uid);
+    _rides = updated;
+    notifyListeners();
   }
 
   Future<RideHistoryModel?> startRide({
@@ -48,13 +90,11 @@ class RideHistoryViewModel extends AsyncNotifier<List<RideHistoryModel>> {
       amountPaid: amountPaid,
     );
 
-    final sessionId = await ref
-        .read(rideHistoryRepositoryProvider)
-        .createRideHistory(history);
+    final sessionId = await _repository.createRideHistory(history);
 
     final createdHistory = history.copyWith(id: sessionId);
     _upsertLocalHistory(createdHistory);
-    ref.invalidateSelf();
+    unawaited(fetchHistory());
     return createdHistory;
   }
 
@@ -66,20 +106,18 @@ class RideHistoryViewModel extends AsyncNotifier<List<RideHistoryModel>> {
   }) async {
     final endedAtMs = DateTime.now().millisecondsSinceEpoch;
 
-    await ref.read(rideHistoryRepositoryProvider).updateRideHistory(sessionId, {
+    await _repository.updateRideHistory(sessionId, {
       RideHistoryDto.returnStationNameKey: returnStationName,
       RideHistoryDto.returnStationAddressKey: returnStationAddress,
       RideHistoryDto.endedAtMsKey: endedAtMs,
       RideHistoryDto.durationSecondsKey: durationSeconds,
     });
 
-    final rides = state.asData?.value;
+    final rides = _rides;
     RideHistoryModel? currentRide;
-    if (rides != null) {
-      final rideIndex = rides.indexWhere((ride) => ride.id == sessionId);
-      if (rideIndex != -1) {
-        currentRide = rides[rideIndex];
-      }
+    final rideIndex = rides.indexWhere((ride) => ride.id == sessionId);
+    if (rideIndex != -1) {
+      currentRide = rides[rideIndex];
     }
     if (currentRide != null) {
       _upsertLocalHistory(
@@ -92,11 +130,6 @@ class RideHistoryViewModel extends AsyncNotifier<List<RideHistoryModel>> {
       );
     }
 
-    ref.invalidateSelf();
+    unawaited(fetchHistory());
   }
 }
-
-final rideHistoryViewModelProvider =
-    AsyncNotifierProvider<RideHistoryViewModel, List<RideHistoryModel>>(() {
-      return RideHistoryViewModel();
-    });

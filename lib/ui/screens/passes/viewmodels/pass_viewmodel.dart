@@ -1,21 +1,55 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 import 'package:velo_toulouse_redesign/models/pass_model.dart';
+import 'package:velo_toulouse_redesign/data/repositories/passes/pass_repository.dart';
+import 'package:velo_toulouse_redesign/data/repositories/passes/pass_repository_firebase.dart';
 import '../../../../core/providers/pass_booking_provider.dart';
 
-final passViewModelProvider =
-    AsyncNotifierProvider<PassViewModel, List<PassModel>>(PassViewModel.new);
+class PassViewModel extends ChangeNotifier {
+  PassViewModel({PassRepository? repository})
+    : _repository = repository ?? PassRepositoryFirebase() {
+    unawaited(fetchPasses());
+  }
 
-class PassViewModel extends AsyncNotifier<List<PassModel>> {
-  @override
-  Future<List<PassModel>> build() async {
-    final repo = ref.read(passRepositoryProvider);
-    return repo.getAvailablePasses();
+  final PassRepository _repository;
+  UserViewModel? _userViewModel;
+  PassBookingProvider? _bookingProvider;
+
+  List<PassModel> _passes = <PassModel>[];
+  bool _isLoading = false;
+  String? _error;
+
+  List<PassModel> get passes => _passes;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
+  void updateDependencies(
+    UserViewModel userViewModel,
+    PassBookingProvider bookingProvider,
+  ) {
+    _userViewModel = userViewModel;
+    _bookingProvider = bookingProvider;
+  }
+
+  Future<void> fetchPasses() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _passes = await _repository.getAvailablePasses();
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   bool hasActivePass() {
-    final user = ref.read(userViewModelProvider).value;
+    final user = _userViewModel?.user;
     if (user?.activePassExpiry == null) return false;
 
     try {
@@ -28,7 +62,7 @@ class PassViewModel extends AsyncNotifier<List<PassModel>> {
   }
 
   String getExpiryDate() {
-    final selectedPass = ref.read(selectedPassProvider);
+    final selectedPass = _bookingProvider?.selectedPass;
     if (selectedPass == null) return '';
 
     final now = DateTime.now();
@@ -52,7 +86,7 @@ class PassViewModel extends AsyncNotifier<List<PassModel>> {
 
   Future<void> purchasePass(PassModel pass) async {
     final expiryDate = getExpiryDate();
-    final user = ref.read(userViewModelProvider).value;
+    final user = _userViewModel?.user;
 
     if (user != null) {
       final updatedUser = user.copyWith(
@@ -60,9 +94,7 @@ class PassViewModel extends AsyncNotifier<List<PassModel>> {
         activePassTitle: pass.title,
         activePassExpiry: expiryDate,
       );
-      await ref
-          .read(userViewModelProvider.notifier)
-          .updateUserProfile(updatedUser);
+      await _userViewModel?.updateUserProfile(updatedUser);
     }
   }
 }

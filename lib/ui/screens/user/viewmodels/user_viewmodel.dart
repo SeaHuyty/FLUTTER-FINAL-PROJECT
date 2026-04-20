@@ -1,78 +1,148 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:velo_toulouse_redesign/models/user_model.dart';
+import 'package:velo_toulouse_redesign/data/repositories/users/user_repository.dart';
 import 'package:velo_toulouse_redesign/data/repositories/users/user_firebase_repository.dart';
-import 'package:velo_toulouse_redesign/core/providers/auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class UserViewModel extends AsyncNotifier<UserModel?> {
-  @override
-  Future<UserModel?> build() async {
-    final authUser = ref.watch(authStateProvider).asData?.value;
-    if (authUser == null) return null;
-    return ref.read(userRepositoryProvider).getUserProfile(authUser.uid);
+class UserViewModel extends ChangeNotifier {
+  UserViewModel({UserRepository? repository})
+    : _repository = repository ?? UserFirebaseRepository();
+
+  final UserRepository _repository;
+  String? _authUid;
+
+  UserModel? _user;
+  bool _isLoading = false;
+  String? _error;
+
+  UserModel? get user => _user;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+  bool get hasError => _error != null;
+
+  Future<void> onAuthUserChanged(User? authUser) async {
+    final newUid = authUser?.uid;
+    if (_authUid == newUid) return;
+    _authUid = newUid;
+
+    if (newUid == null) {
+      _user = null;
+      _isLoading = false;
+      _error = null;
+      notifyListeners();
+      return;
+    }
+
+    await loadCurrentUser();
+  }
+
+  Future<void> loadCurrentUser() async {
+    if (_authUid == null) {
+      _user = null;
+      notifyListeners();
+      return;
+    }
+
+    _setLoading(true);
+    try {
+      _user = await _repository.getUserProfile(_authUid!);
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   Future<String?> signUp(String email, String password) async {
-    state = const AsyncLoading();
+    _setLoading(true);
     String? uid;
-    state = await AsyncValue.guard(() async {
-      uid = await ref.read(userRepositoryProvider).signUp(email, password);
-      return null;
-    });
+    try {
+      uid = await _repository.signUp(email, password);
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
     return uid;
   }
 
   Future<void> login(String email, String password) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await ref.read(userRepositoryProvider).login(email, password);
-      return null;
-    });
+    _setLoading(true);
+    try {
+      await _repository.login(email, password);
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   Future<void> signOut() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await ref.read(userRepositoryProvider).signOut();
-      return null;
-    });
+    _setLoading(true);
+    try {
+      await _repository.signOut();
+      _error = null;
+      _user = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   Future<void> createUserProfile(UserModel user) async {
-    state = await AsyncValue.guard(() async {
-      await ref.read(userRepositoryProvider).createUserProfile(user);
-      return user;
-    });
+    _setLoading(true);
+    try {
+      await _repository.createUserProfile(user);
+      _user = user;
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   Future<void> updateUserProfile(UserModel user) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await ref.read(userRepositoryProvider).updateUserProfile(user);
-      return user;
-    });
+    _setLoading(true);
+    try {
+      await _repository.updateUserProfile(user);
+      _user = user;
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   Future<void> removeActivePass() async {
-    final user = state.value;
+    final user = _user;
     if (user == null) return;
 
-    final updatedUser = user.copyWith(
-      clearActivePass: true,
-    );
+    final updatedUser = user.copyWith(clearActivePass: true);
 
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await ref.read(userRepositoryProvider).updateUserProfile(updatedUser);
-      return updatedUser;
-    });
+    _setLoading(true);
+    try {
+      await _repository.updateUserProfile(updatedUser);
+      _user = updatedUser;
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   Future<void> resetPassword(String email) async {
-    await ref.read(userRepositoryProvider).resetPassword(email);
+    await _repository.resetPassword(email);
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
   }
 }
-
-final userViewModelProvider =
-    AsyncNotifierProvider<UserViewModel, UserModel?>(() {
-  return UserViewModel();
-});
