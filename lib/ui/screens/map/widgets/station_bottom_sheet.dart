@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/models/station_model.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/viewmodels/pass_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_booking_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/bike_renting_screen.dart';
 
-class StationBottomSheet extends ConsumerWidget {
+class StationBottomSheet extends StatelessWidget {
   final StationModel station;
   const StationBottomSheet({super.key, required this.station});
 
@@ -30,7 +30,7 @@ class StationBottomSheet extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFFF4F6F3),
@@ -195,8 +195,8 @@ class StationBottomSheet extends ConsumerWidget {
                 final bike = station.dockedBikes[i];
                 return GestureDetector(
                   onTap: () {
-                    final hasPass = ref
-                        .read(passViewModelProvider.notifier)
+                    final hasPass = context
+                        .read<PassViewModel>()
                         .hasActivePass();
                     if (hasPass) {
                       Navigator.push(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/models/bike_model.dart';
@@ -8,7 +8,7 @@ import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride_screen.dart';
 import 'package:velo_toulouse_redesign/ui/shared/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/shared/display/top_bar/app_bar.dart';
 
-class PassbookingScreen extends ConsumerStatefulWidget {
+class PassbookingScreen extends StatefulWidget {
   final String stationId;
   final String stationName;
   final String stationAddress;
@@ -23,10 +23,10 @@ class PassbookingScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<PassbookingScreen> createState() => _BikeRentingScreenState();
+  State<PassbookingScreen> createState() => _BikeRentingScreenState();
 }
 
-class _BikeRentingScreenState extends ConsumerState<PassbookingScreen> {
+class _BikeRentingScreenState extends State<PassbookingScreen> {
   bool _isStartingRide = false;
 
   @override
@@ -189,12 +189,10 @@ class _BikeRentingScreenState extends ConsumerState<PassbookingScreen> {
 
                         try {
                           try {
-                            await ref
-                                .read(stationViewModelProvider.notifier)
-                                .checkoutBike(
-                                  stationId: widget.stationId,
-                                  bikeNumber: widget.bike.plateNumber,
-                                );
+                            await context.read<StationViewModel>().checkoutBike(
+                              stationId: widget.stationId,
+                              bikeNumber: widget.bike.plateNumber,
+                            );
                           } catch (_) {
                             if (!context.mounted) return;
 
@@ -208,16 +206,16 @@ class _BikeRentingScreenState extends ConsumerState<PassbookingScreen> {
                             return;
                           }
 
-                          ref
-                              .read(rideSessionProvider.notifier)
-                              .state = RideSession(
-                            fromStationId: widget.stationId,
-                            bikeNumber: widget.bike.plateNumber,
-                            fromStationName: widget.stationName,
-                            fromStationAddress: widget.stationAddress,
-                          );
-
                           if (!context.mounted) return;
+
+                          context.read<RideSessionProvider>().setSession(
+                            RideSession(
+                              fromStationId: widget.stationId,
+                              bikeNumber: widget.bike.plateNumber,
+                              fromStationName: widget.stationName,
+                              fromStationAddress: widget.stationAddress,
+                            ),
+                          );
 
                           Navigator.push(
                             context,
