@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/map_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/select_pass_screen.dart';
 
-class MainScreen extends ConsumerStatefulWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  ConsumerState<MainScreen> createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> {
+class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  static const _screens = [MapScreen(), SelectPassScreen(), UserProfileScreen()];
+  static const _screens = [
+    MapScreen(),
+    SelectPassScreen(),
+    UserProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
