@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/models/bike_model.dart';
@@ -8,7 +8,7 @@ import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/bottom_action_con
 import 'package:velo_toulouse_redesign/ui/shared/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/shared/display/top_bar/app_bar.dart';
 
-class BikeRentingScreen extends ConsumerStatefulWidget {
+class BikeRentingScreen extends StatefulWidget {
   final String stationId;
   final String stationName;
   final String stationAddress;
@@ -23,10 +23,10 @@ class BikeRentingScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<BikeRentingScreen> createState() => _BikeRentingScreenState();
+  State<BikeRentingScreen> createState() => _BikeRentingScreenState();
 }
 
-class _BikeRentingScreenState extends ConsumerState<BikeRentingScreen> {
+class _BikeRentingScreenState extends State<BikeRentingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -333,11 +333,13 @@ class _BikeRentingScreenState extends ConsumerState<BikeRentingScreen> {
             child: VeloButton(
               text: "Pay now",
               onPressed: () {
-                ref.read(rideSessionProvider.notifier).state = RideSession(
-                  fromStationId: widget.stationId,
-                  bikeNumber: widget.bike.plateNumber,
-                  fromStationName: widget.stationName,
-                  fromStationAddress: widget.stationAddress,
+                context.read<RideSessionProvider>().setSession(
+                  RideSession(
+                    fromStationId: widget.stationId,
+                    bikeNumber: widget.bike.plateNumber,
+                    fromStationName: widget.stationName,
+                    fromStationAddress: widget.stationAddress,
+                  ),
                 );
 
                 Navigator.push(

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
@@ -15,14 +15,14 @@ import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/ride_bottom_sheet
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/station_selection_card.dart';
 import 'package:velo_toulouse_redesign/ui/shared/station_markers_layer.dart';
 
-class ActiveRideScreen extends ConsumerStatefulWidget {
+class ActiveRideScreen extends StatefulWidget {
   const ActiveRideScreen({super.key});
 
   @override
-  ConsumerState<ActiveRideScreen> createState() => _ActiveRideScreenState();
+  State<ActiveRideScreen> createState() => _ActiveRideScreenState();
 }
 
-class _ActiveRideScreenState extends ConsumerState<ActiveRideScreen> {
+class _ActiveRideScreenState extends State<ActiveRideScreen> {
   late final Timer _timer;
   int _secondsElapsed = 0;
   StationModel? _returnStation;
@@ -64,16 +64,14 @@ class _ActiveRideScreenState extends ConsumerState<ActiveRideScreen> {
   }
 
   Future<void> _onDocked() async {
-    final rideSession = ref.read(rideSessionProvider);
+    final rideSession = context.read<RideSessionProvider>().session;
     if (rideSession == null || _returnStation == null) return;
 
     try {
-      await ref
-          .read(stationViewModelProvider.notifier)
-          .dockBike(
-            stationId: _returnStation!.id,
-            bikeNumber: rideSession.bikeNumber,
-          );
+      await context.read<StationViewModel>().dockBike(
+        stationId: _returnStation!.id,
+        bikeNumber: rideSession.bikeNumber,
+      );
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -85,23 +83,25 @@ class _ActiveRideScreenState extends ConsumerState<ActiveRideScreen> {
       return;
     }
 
+    if (!mounted) return;
+
     if (rideSession.sessionId != null) {
-      await ref
-          .read(rideHistoryViewModelProvider.notifier)
-          .completeRide(
-            sessionId: rideSession.sessionId!,
-            returnStationName: _returnStation!.name,
-            returnStationAddress: _returnStation!.address,
-            durationSeconds: _secondsElapsed,
-          );
+      await context.read<RideHistoryViewModel>().completeRide(
+        sessionId: rideSession.sessionId!,
+        returnStationName: _returnStation!.name,
+        returnStationAddress: _returnStation!.address,
+        durationSeconds: _secondsElapsed,
+      );
     }
 
-    ref.read(rideSessionProvider.notifier).state = rideSession.copyWith(
-      returnStationName: _returnStation!.name,
-      returnStationAddress: _returnStation!.address,
+    if (!mounted) return;
+    context.read<RideSessionProvider>().setSession(
+      rideSession.copyWith(
+        returnStationName: _returnStation!.name,
+        returnStationAddress: _returnStation!.address,
+      ),
     );
 
-    if (!mounted) return;
 
     _timer.cancel();
     Navigator.pushReplacement(
@@ -199,7 +199,7 @@ class _ActiveRideScreenState extends ConsumerState<ActiveRideScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rideSession = ref.watch(rideSessionProvider);
+    final rideSession = context.watch<RideSessionProvider>().session;
     if (rideSession == null) {
       return const Scaffold(
         body: Center(
@@ -208,37 +208,41 @@ class _ActiveRideScreenState extends ConsumerState<ActiveRideScreen> {
       );
     }
 
-    final stationsAsync = ref.watch(stationViewModelProvider);
+    final stationViewModel = context.watch<StationViewModel>();
     final hasReturnStation = _returnStation != null;
 
     return Scaffold(
       body: Stack(
         children: [
           // ── Full screen map ───────────────────────────────────────
-          stationsAsync.when(
-            loading: () => const SizedBox.expand(),
-            error: (_, _) => const SizedBox.expand(),
-            data: (stations) {
-              final returnable = _returnableStations(stations);
-              return FlutterMap(
-                options: MapOptions(
-                  initialCenter: const LatLng(13.3590756, 103.8709673),
-                  initialZoom: 13.5,
-                  onTap: (_, _) => _dismissStationCard(),
-                ),
-                children: [
-                  TileLayer(urlTemplate: AppConfig.mapboxTileUrl),
-                  StationMarkersLayer(
-                    stations: returnable,
-                    returnStationId: _returnStation?.id,
-                    selectedStationId: _selectedStation?.id,
-                    onMarkerTap: _onMarkerTap,
-                    displayedValueBuilder: (station) => station.availableSpots,
+          if (!stationViewModel.isLoading && stationViewModel.error == null)
+            Builder(
+              builder: (_) {
+                final returnable = _returnableStations(
+                  stationViewModel.stations,
+                );
+                return FlutterMap(
+                  options: MapOptions(
+                    initialCenter: const LatLng(13.3590756, 103.8709673),
+                    initialZoom: 13.5,
+                    onTap: (_, _) => _dismissStationCard(),
                   ),
-                ],
-              );
-            },
-          ),
+                  children: [
+                    TileLayer(urlTemplate: AppConfig.mapboxTileUrl),
+                    StationMarkersLayer(
+                      stations: returnable,
+                      returnStationId: _returnStation?.id,
+                      selectedStationId: _selectedStation?.id,
+                      onMarkerTap: _onMarkerTap,
+                      displayedValueBuilder: (station) =>
+                          station.availableSpots,
+                    ),
+                  ],
+                );
+              },
+            )
+          else
+            const SizedBox.expand(),
 
           // ── Legend pill ───────────────────────────────────────────
           Positioned(

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/viewmodels/pass_viewmodel.dart';
@@ -14,14 +14,14 @@ import 'package:velo_toulouse_redesign/ui/shared/display/top_bar/app_bar.dart';
 
 enum ProcessStage { initialize, paying, processing, paid }
 
-class PaymentScreen extends ConsumerStatefulWidget {
+class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
 
   @override
-  ConsumerState<PaymentScreen> createState() => _PaymentScreenState();
+  State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-class _PaymentScreenState extends ConsumerState<PaymentScreen> {
+class _PaymentScreenState extends State<PaymentScreen> {
   Timer? _stageTimer;
   ProcessStage stage = ProcessStage.initialize;
 
@@ -62,19 +62,17 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     setState(() => stage = next);
 
     if (next == ProcessStage.paid) {
-      final selectedPass = ref.read(selectedPassProvider);
+      final selectedPass = context.read<PassBookingProvider>().selectedPass;
       if (selectedPass != null) {
-        ref.read(passViewModelProvider.notifier).purchasePass(selectedPass);
+        context.read<PassViewModel>().purchasePass(selectedPass);
       } else {
-        final currentRide = ref.read(rideSessionProvider);
+        final currentRide = context.read<RideSessionProvider>().session;
         if (currentRide?.fromStationId != null) {
           try {
-            await ref
-                .read(stationViewModelProvider.notifier)
-                .checkoutBike(
-                  stationId: currentRide!.fromStationId!,
-                  bikeNumber: currentRide.bikeNumber,
-                );
+            await context.read<StationViewModel>().checkoutBike(
+              stationId: currentRide!.fromStationId!,
+              bikeNumber: currentRide.bikeNumber,
+            );
           } catch (_) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -101,8 +99,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rideSession = ref.watch(rideSessionProvider);
-    final selectedPass = ref.watch(selectedPassProvider);
+    final rideSession = context.watch<RideSessionProvider>().session;
+    final selectedPass = context.watch<PassBookingProvider>().selectedPass;
 
     if (rideSession == null && selectedPass == null) {
       return const Scaffold(
@@ -176,7 +174,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   }
 
   Widget _buildPaying() {
-    final selectedPass = ref.watch(selectedPassProvider);
+    final selectedPass = context.watch<PassBookingProvider>().selectedPass;
 
     final String amountLabel = selectedPass != null
         ? '${selectedPass.price.toStringAsFixed(2)} USD'

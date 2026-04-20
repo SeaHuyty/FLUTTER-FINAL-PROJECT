@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/bottom_action_container.dart';
 import 'package:velo_toulouse_redesign/ui/shared/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/shared/success_header.dart';
 
-class RideSummaryScreen extends ConsumerWidget {
+class RideSummaryScreen extends StatelessWidget {
   final int secondsElapsed;
 
   const RideSummaryScreen({super.key, required this.secondsElapsed});
@@ -19,8 +19,8 @@ class RideSummaryScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final rideSession = ref.watch(rideSessionProvider);
+  Widget build(BuildContext context) {
+    final rideSession = context.watch<RideSessionProvider>().session;
     if (rideSession == null) {
       return const Scaffold(
         body: Center(
@@ -138,7 +138,7 @@ class RideSummaryScreen extends ConsumerWidget {
             child: VeloButton(
               text: 'Back to Map',
               onPressed: () {
-                ref.read(rideSessionProvider.notifier).state = null;
+                context.read<RideSessionProvider>().clear();
                 // Pop all the way back to the map screen
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },

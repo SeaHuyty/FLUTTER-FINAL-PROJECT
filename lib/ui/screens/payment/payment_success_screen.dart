@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
@@ -12,21 +12,20 @@ import 'package:velo_toulouse_redesign/ui/shared/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/shared/display/payment_info_card_widget.dart';
 import 'package:velo_toulouse_redesign/ui/shared/success_header.dart';
 
-class PaymentSuccessScreen extends ConsumerStatefulWidget {
+class PaymentSuccessScreen extends StatefulWidget {
   const PaymentSuccessScreen({super.key});
 
   @override
-  ConsumerState<PaymentSuccessScreen> createState() =>
-      _PaymentSuccessScreenState();
+  State<PaymentSuccessScreen> createState() => _PaymentSuccessScreenState();
 }
 
-class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
+class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
   bool _isStartingRide = false;
 
   @override
   Widget build(BuildContext context) {
-    final rideSession = ref.watch(rideSessionProvider);
-    final selectedPass = ref.watch(selectedPassProvider);
+    final rideSession = context.watch<RideSessionProvider>().session;
+    final selectedPass = context.watch<PassBookingProvider>().selectedPass;
 
     if (rideSession == null && selectedPass == null) {
       return const Scaffold(
@@ -55,9 +54,7 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
               const SizedBox(height: 30),
               PaymentInfoCardWidget(
                 pass: selectedPass,
-                expiryDate: ref
-                    .read(passViewModelProvider.notifier)
-                    .getExpiryDate(),
+                expiryDate: context.read<PassViewModel>().getExpiryDate(),
               ),
             ],
             const SizedBox(height: 50),
@@ -76,10 +73,7 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                   ? null
                   : () async {
                       final currentRideSession = rideSession;
-                      final authUser = ref
-                          .read(authStateProvider)
-                          .asData
-                          ?.value;
+                      final authUser = context.read<AuthProvider>().user;
 
                       if (authUser == null || currentRideSession == null) {
                         return;
@@ -90,8 +84,8 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                           _isStartingRide = true;
                         });
                         try {
-                          final history = await ref
-                              .read(rideHistoryViewModelProvider.notifier)
+                          final history = await context
+                              .read<RideHistoryViewModel>()
                               .startRide(
                                 userId: authUser.uid,
                                 bikeNumber: currentRideSession.bikeNumber,
@@ -104,13 +98,14 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                               );
 
                           if (history != null) {
-                            ref
-                                .read(rideSessionProvider.notifier)
-                                .state = currentRideSession.copyWith(
-                              sessionId: history.id,
-                              userId: history.userId,
-                              startedAtMs: history.startedAtMs,
-                              amountPaid: history.amountPaid,
+                            if (!context.mounted) return;
+                            context.read<RideSessionProvider>().setSession(
+                              currentRideSession.copyWith(
+                                sessionId: history.id,
+                                userId: history.userId,
+                                startedAtMs: history.startedAtMs,
+                                amountPaid: history.amountPaid,
+                              ),
                             );
                           }
                         } finally {

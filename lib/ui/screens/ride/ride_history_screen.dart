@@ -1,51 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/theme/theme.dart';
 import 'package:velo_toulouse_redesign/models/ride_history_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/viewmodels/ride_history_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/shared/display/top_bar/app_bar.dart';
 
-class RideHistoryScreen extends ConsumerWidget {
+class RideHistoryScreen extends StatelessWidget {
   const RideHistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final historyAsync = ref.watch(rideHistoryViewModelProvider);
+  Widget build(BuildContext context) {
+    final historyViewModel = context.watch<RideHistoryViewModel>();
 
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: StationAppBar(title: 'Ride History'),
-      body: historyAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Failed to load history: $error'),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => ref.refresh(rideHistoryViewModelProvider),
-                child: const Text('Retry'),
+      body: historyViewModel.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : historyViewModel.error != null
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Failed to load history: ${historyViewModel.error}'),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () =>
+                        context.read<RideHistoryViewModel>().fetchHistory(),
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        data: (history) {
-          if (history.isEmpty) {
-            return const Center(child: Text('No rides yet'));
-          }
+            )
+          : Builder(
+              builder: (_) {
+                final history = historyViewModel.rides;
+                if (history.isEmpty) {
+                  return const Center(child: Text('No rides yet'));
+                }
 
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            itemCount: history.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
-            itemBuilder: (context, index) {
-              final item = history[index];
-              return _HistoryTile(item: item);
-            },
-          );
-        },
-      ),
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  itemCount: history.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final item = history[index];
+                    return _HistoryTile(item: item);
+                  },
+                );
+              },
+            ),
     );
   }
 }
