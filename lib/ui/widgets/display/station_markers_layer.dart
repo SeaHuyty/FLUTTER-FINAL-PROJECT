@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/models/station.dart';
 
 class StationMarkersLayer extends StatelessWidget {
   final List<StationModel> stations;

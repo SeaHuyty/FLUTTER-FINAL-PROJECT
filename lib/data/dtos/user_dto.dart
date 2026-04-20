@@ -1,4 +1,4 @@
-import 'package:velo_toulouse_redesign/models/user_model.dart';
+import 'package:velo_toulouse_redesign/models/user.dart';
 
 class UserDto {
   static const String nameKey = 'name';

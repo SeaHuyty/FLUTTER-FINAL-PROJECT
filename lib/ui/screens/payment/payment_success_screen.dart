@@ -8,9 +8,9 @@ import 'package:velo_toulouse_redesign/core/providers/auth_provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/viewmodels/ride_history_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/main_screen.dart';
-import 'package:velo_toulouse_redesign/ui/shared/actions/button.dart';
-import 'package:velo_toulouse_redesign/ui/shared/display/payment_info_card_widget.dart';
-import 'package:velo_toulouse_redesign/ui/shared/success_header.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/display/payment_info_card_widget.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/display/success_header.dart';
 
 class PaymentSuccessScreen extends StatefulWidget {
   const PaymentSuccessScreen({super.key});

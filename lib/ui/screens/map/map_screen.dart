@@ -3,14 +3,14 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
-import 'package:velo_toulouse_redesign/core/utils/app_config.dart';
-import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
+import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/viewmodels/pass_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/viewmodels/station_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/widgets/station_bottom_sheet.dart';
-import 'package:velo_toulouse_redesign/ui/shared/station_markers_layer.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/display/station_markers_layer.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});

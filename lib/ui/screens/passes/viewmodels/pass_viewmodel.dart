@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
-import 'package:velo_toulouse_redesign/models/pass_model.dart';
+import 'package:velo_toulouse_redesign/models/pass.dart';
 import 'package:velo_toulouse_redesign/data/repositories/passes/pass_repository.dart';
 import 'package:velo_toulouse_redesign/data/repositories/passes/pass_repository_firebase.dart';
 import '../../../../core/providers/pass_booking_provider.dart';

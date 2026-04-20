@@ -1,5 +1,5 @@
 import 'package:velo_toulouse_redesign/data/dtos/bike_dto.dart';
-import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/models/station.dart';
 
 class StationDto {
   static const String name = 'name';

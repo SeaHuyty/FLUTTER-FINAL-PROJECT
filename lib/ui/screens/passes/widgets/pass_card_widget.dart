@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
-import 'package:velo_toulouse_redesign/models/pass_model.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/models/pass.dart';
 
 class PassCardWidget extends StatelessWidget {
   final PassModel pass;

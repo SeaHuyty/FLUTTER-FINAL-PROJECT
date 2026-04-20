@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:velo_toulouse_redesign/models/pass_model.dart';
+import 'package:velo_toulouse_redesign/models/pass.dart';
 import '../../dtos/pass_dto.dart';
 import 'pass_repository.dart';
 

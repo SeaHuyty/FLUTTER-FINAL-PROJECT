@@ -3,7 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
-import 'package:velo_toulouse_redesign/core/utils/app_config.dart';
+import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///

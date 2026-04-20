@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
 import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository_firebase.dart';
 

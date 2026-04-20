@@ -10,7 +10,7 @@ import 'package:velo_toulouse_redesign/ui/screens/map/viewmodels/station_viewmod
 import 'package:velo_toulouse_redesign/ui/screens/payment/payment_success_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/widgets/payment_amount_breakdown.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/widgets/qr_payment_instruction_section.dart';
-import 'package:velo_toulouse_redesign/ui/shared/display/top_bar/app_bar.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
 
 enum ProcessStage { initialize, paying, processing, paid }
 

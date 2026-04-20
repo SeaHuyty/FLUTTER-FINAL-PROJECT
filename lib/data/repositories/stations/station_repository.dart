@@ -1,4 +1,4 @@
-import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/models/station.dart';
 
 abstract class StationRepository {
   Future<List<StationModel>> getStations();

@@ -5,8 +5,8 @@ import 'viewmodels/pass_viewmodel.dart';
 import 'widgets/pass_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../shared/actions/button.dart';
-import '../../../core/theme/theme.dart';
+import '../../widgets/actions/button.dart';
+import '../../theme/theme.dart';
 
 class SelectPassScreen extends StatelessWidget {
   const SelectPassScreen({super.key});

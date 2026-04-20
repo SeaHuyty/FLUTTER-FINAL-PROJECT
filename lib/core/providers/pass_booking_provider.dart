@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:velo_toulouse_redesign/models/pass_model.dart';
+import 'package:velo_toulouse_redesign/models/pass.dart';
 
 class PassBookingProvider extends ChangeNotifier {
   PassModel? _selectedPass;

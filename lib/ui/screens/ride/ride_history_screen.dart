@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
-import 'package:velo_toulouse_redesign/models/ride_history_model.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/models/ride_history.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/viewmodels/ride_history_viewmodel.dart';
-import 'package:velo_toulouse_redesign/ui/shared/display/top_bar/app_bar.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
 
 class RideHistoryScreen extends StatelessWidget {
   const RideHistoryScreen({super.key});

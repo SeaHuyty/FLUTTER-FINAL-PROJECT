@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
-import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/models/station.dart';
 
 class StationSelectionCard extends StatelessWidget {
   final StationModel station;

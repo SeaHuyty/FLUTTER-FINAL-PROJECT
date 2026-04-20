@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/core/providers/pass_booking_provider.dart';
-import 'package:velo_toulouse_redesign/models/user_model.dart';
+import 'package:velo_toulouse_redesign/models/user.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/login_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/edit_profile_screen.dart';

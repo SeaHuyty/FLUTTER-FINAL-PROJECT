@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:velo_toulouse_redesign/models/bike_model.dart';
+import 'package:velo_toulouse_redesign/models/bike.dart';
 
 class BikeViewModel extends ChangeNotifier {
   BikeModel? _bike;

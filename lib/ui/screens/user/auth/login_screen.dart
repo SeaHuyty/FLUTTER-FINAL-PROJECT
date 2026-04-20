@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/forgot_password_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/sign_up_screen.dart';

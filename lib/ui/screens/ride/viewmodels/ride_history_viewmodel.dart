@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:velo_toulouse_redesign/data/dtos/ride_history_dto.dart';
-import 'package:velo_toulouse_redesign/models/ride_history_model.dart';
+import 'package:velo_toulouse_redesign/models/ride_history.dart';
 import 'package:velo_toulouse_redesign/data/repositories/ride_history/ride_history_repository.dart';
 import 'package:velo_toulouse_redesign/data/repositories/ride_history/ride_history_firebase_repository.dart';
 

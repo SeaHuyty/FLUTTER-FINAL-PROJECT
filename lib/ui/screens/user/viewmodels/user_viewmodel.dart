@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:velo_toulouse_redesign/models/user_model.dart';
+import 'package:velo_toulouse_redesign/models/user.dart';
 import 'package:velo_toulouse_redesign/data/repositories/users/user_repository.dart';
 import 'package:velo_toulouse_redesign/data/repositories/users/user_firebase_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';

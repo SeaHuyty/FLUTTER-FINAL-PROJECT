@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/pass_booking_provider.dart';
-import '../../shared/display/top_bar/app_bar.dart';
+import '../../widgets/display/header/app_bar.dart';
 import 'widgets/payment_method_widget.dart';
-import '../../shared/display/payment_info_card_widget.dart';
-import '../../shared/actions/button.dart';
+import '../../widgets/display/payment_info_card_widget.dart';
+import '../../widgets/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/payment_screen.dart';
 
 class PassPaymentScreen extends StatelessWidget {

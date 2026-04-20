@@ -1,4 +1,4 @@
-import 'package:velo_toulouse_redesign/models/ride_history_model.dart';
+import 'package:velo_toulouse_redesign/models/ride_history.dart';
 
 class RideHistoryDto {
   static const String userIdKey = 'user_id';

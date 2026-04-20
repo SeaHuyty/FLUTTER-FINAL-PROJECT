@@ -1,4 +1,4 @@
-import 'package:velo_toulouse_redesign/models/user_model.dart';
+import 'package:velo_toulouse_redesign/models/user.dart';
 
 abstract class UserRepository {
   Future<String> signUp(String email, String password);

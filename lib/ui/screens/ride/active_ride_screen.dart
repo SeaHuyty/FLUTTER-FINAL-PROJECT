@@ -4,16 +4,16 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
-import 'package:velo_toulouse_redesign/core/utils/app_config.dart';
-import 'package:velo_toulouse_redesign/models/station_model.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
+import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/viewmodels/station_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/viewmodels/ride_history_viewmodel.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/ride_summary_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/legend_pill.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/ride_bottom_sheet.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/station_selection_card.dart';
-import 'package:velo_toulouse_redesign/ui/shared/station_markers_layer.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/display/station_markers_layer.dart';
 
 class ActiveRideScreen extends StatefulWidget {
   const ActiveRideScreen({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/map_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/select_pass_screen.dart';

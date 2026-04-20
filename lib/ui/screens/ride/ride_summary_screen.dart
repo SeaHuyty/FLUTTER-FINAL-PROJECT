@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/core/providers/ride_session_provider.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/bottom_action_container.dart';
-import 'package:velo_toulouse_redesign/ui/shared/actions/button.dart';
-import 'package:velo_toulouse_redesign/ui/shared/success_header.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
+import 'package:velo_toulouse_redesign/ui/widgets/display/success_header.dart';
 
 class RideSummaryScreen extends StatelessWidget {
   final int secondsElapsed;

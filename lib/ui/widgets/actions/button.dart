@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:velo_toulouse_redesign/core/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 
 class VeloButton extends StatelessWidget {
   final String text;
