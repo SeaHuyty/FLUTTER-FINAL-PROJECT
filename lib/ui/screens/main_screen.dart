@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/map_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile/user_profile_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/pass_selection_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static const _screens = [
     MapScreen(),
-    SelectPassScreen(),
+    PassSelectionScreen(),
     UserProfileScreen(),
   ];
 

@@ -8,7 +8,7 @@ class PassRepositoryFirebase implements PassRepository {
   final String _url = 'https://select-pass-default-rtdb.asia-southeast1.firebasedatabase.app/pass.json';
 
   @override
-  Future<List<PassModel>> getAvailablePasses() async {
+  Future<List<PassModel>> getPasses() async {
     final response = await http.get(Uri.parse(_url));
 
     if (response.statusCode == 200) {
@@ -18,12 +18,8 @@ class PassRepositoryFirebase implements PassRepository {
         return PassDto.fromSnapshot(entry.key, entry.value);
       }).toList();
     } else {
-      throw Exception('Could not load passes from Firebase');
+      throw Exception('Failed to load passes');
     }
   }
 
-  @override
-  Future<PassModel?> getPassById(String passId) async {
-    return null;
-  }
 }

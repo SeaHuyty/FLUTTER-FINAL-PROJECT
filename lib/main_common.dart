@@ -1,8 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+import 'package:velo_toulouse_redesign/ui/screens/splash/splash_screen.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/viewmodels/auth_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/map_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/auth/login/login_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile/user_profile_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/pass_selection_screen.dart';
+
+Widget mainCommon(List<SingleChildWidget> appProviders) {
+  return MultiProvider(
+    providers: appProviders,
+    child: MaterialApp(
+      title: 'Velo Toulouse',
+      debugShowCheckedModeBanner: false,
+      home: const AuthWrapper(),
+    ),
+  );
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = context.watch<AuthProvider>();
+    if (authState.isLoading) {
+      return const SplashScreen();
+    }
+
+    return authState.isAuthenticated
+        ? const MainScreen()
+        : const LoginScreen();
+  }
+}
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,7 +48,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static const _screens = [
     MapScreen(),
-    SelectPassScreen(),
+    PassSelectionScreen(),
     UserProfileScreen(),
   ];
 
