@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/view_model/pass_payment_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/widgets/payment_method_widget.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/qr_payment_screen.dart';
+import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/payment_info_card_widget.dart';
@@ -11,24 +12,35 @@ class PassPaymentContent extends StatelessWidget {
 	const PassPaymentContent({super.key});
 
 	void _goToPayment(BuildContext context) {
+		final vm = context.read<PassPaymentViewModel>();
 		Navigator.push(
 			context,
-			MaterialPageRoute(builder: (_) => const PaymentScreen()),
+			MaterialPageRoute(
+				builder: (_) => ChangeNotifierProvider.value(
+					value: vm,
+					child: const PaymentScreen(),
+				),
+			),
 		);
 	}
 
 	@override
 	Widget build(BuildContext context) {
 		final vm = context.watch<PassPaymentViewModel>();
+		final selectedPass = vm.selectedPass;
 
-		return Scaffold(
-			backgroundColor: const Color(0xFFF8F9FA),
-			appBar: const StationAppBar(title: 'Payment'),
-			body: Column(
+		Widget body;
+		if (vm.selectedPassState.state == AsyncValueState.loading) {
+			body = const Center(child: CircularProgressIndicator());
+		} else if (vm.selectedPassState.state == AsyncValueState.error) {
+			body = const Center(child: Text('Error loading selected pass'));
+		} else if (selectedPass == null) {
+			body = const Center(child: Text('No pass selected'));
+		} else {
+			body = Column(
 				children: [
 					const SizedBox(height: 10),
-					if (vm.selectedPass != null)
-          PaymentInfoCardWidget(pass: vm.selectedPass!),
+					PaymentInfoCardWidget(pass: selectedPass),
 					const SizedBox(height: 20),
 					Container(
 						padding: const EdgeInsets.only(
@@ -54,7 +66,13 @@ class PassPaymentContent extends StatelessWidget {
 						),
 					),
 				],
-			),
+			);
+		}
+
+		return Scaffold(
+			backgroundColor: const Color(0xFFF8F9FA),
+			appBar: const StationAppBar(title: 'Payment'),
+			body: body,
 		);
 	}
 }

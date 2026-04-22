@@ -10,16 +10,21 @@ class PassBookingContent extends StatelessWidget {
 	const PassBookingContent({super.key});
 
 	Future<void> _onStartRide(BuildContext context, PassBookingViewModel vm) async {
-		final started = await context.read<PassBookingViewModel>().startRide();
+		final started = await vm.startRide();
 
 		if (!context.mounted) {
 			return;
 		}
 
 		if (!started) {
+			final errorText = vm.startRideState.error?.toString();
 			ScaffoldMessenger.of(context).showSnackBar(
-				const SnackBar(
-					content: Text('Could not unlock bike. Please try again.'),
+				SnackBar(
+					content: Text(
+						errorText == null || errorText.isEmpty
+							? 'Could not unlock bike. Please try again.'
+							: errorText,
+					),
 				),
 			);
 			return;
@@ -181,7 +186,9 @@ class PassBookingContent extends StatelessWidget {
 						Center(
 							child: VeloButton(
 								text: 'Start Riding',
-								onPressed: vm.isStartingRide ? null : () => _onStartRide(context, vm),
+								onPressed: vm.isStartingRide
+									? null
+									: () => _onStartRide(context, vm),
 							),
 						),
 					],

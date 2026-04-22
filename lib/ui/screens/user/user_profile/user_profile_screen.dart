@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/login_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/edit_profile_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/ride_history_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/widgets/pass_info_card.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/widgets/user_menu.dart';
 
 class UserProfileScreen extends StatelessWidget {
@@ -86,25 +84,7 @@ class UserProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (user.activePassTitle != null) ...[
-                    const SizedBox(height: 24),
-                    PassInfoCard(
-                      user: user,
-                      onRemovePass: () async {
-                        await context.read<UserViewModel>().removeActivePass();
-
-                        if (!context.mounted) return;
-                        context.read<PassBookingProvider>().setSelectedPass(
-                          null,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Pass removed successfully'),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                  
                   const SizedBox(height: 24),
                   UserMenu(
                     onHistory: () {

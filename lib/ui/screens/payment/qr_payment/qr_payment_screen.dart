@@ -4,9 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/passes/pass_booking/view_model/pass_booking_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/view_model/pass_payment_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/success_payment/success_payment_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/widgets/payment_amount_breakdown.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/widgets/qr_payment_instruction_section.dart';
@@ -62,10 +63,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() => stage = next);
 
     if (next == ProcessStage.paid) {
-      final selectedPass = context.read<PassBookingProvider>().selectedPass;
+      final selectedPass = context.read<PassBookingViewModel>().selectedPass;
       
       if (selectedPass != null) {
-        context.read<PassViewModel>().purchasePass(selectedPass);
+        await context.read<PassPaymentViewModel>().completePassPurchase(
+          context.read<UserViewModel>(),
+        );
       } else {
         final currentRide = context.read<RideSessionViewModel>().session;
 
@@ -102,7 +105,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     final rideSession = context.watch<RideSessionViewModel>().session;
-    final selectedPass = context.watch<PassBookingProvider>().selectedPass;
+    final selectedPass = context.watch<PassPaymentViewModel>().selectedPass;
 
     if (rideSession == null && selectedPass == null) {
       return const Scaffold(
@@ -176,7 +179,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildPaying() {
-    final selectedPass = context.watch<PassBookingProvider>().selectedPass;
+    final selectedPass = context.watch<PassPaymentViewModel>().selectedPass;
 
     final String amountLabel = selectedPass != null
         ? '${selectedPass.price.toStringAsFixed(2)} USD'
