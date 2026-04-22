@@ -4,12 +4,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/widgets/station_bottom_sheet_widget.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/utils/date_format.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/station_markers_layer.dart';
 
 class MapContent extends StatefulWidget {
@@ -29,13 +28,12 @@ class _MapContentState extends State<MapContent> {
 	}
 
 	void _showActivePassAlert() {
-		final passViewModel = context.read<PassViewModel>();
 		final user = context.read<UserViewModel>().user;
 		final mv = context.read<MapViewModel>();
 
-		if (passViewModel.hasActivePass()) {
+		if (DateFormatter.isFutureDate(user?.activePassExpiry)) {
 			final passTitle = mv.resolveActivePassTitle(
-				selectedPassTitle: context.read<PassBookingProvider>().selectedPass?.title,
+				selectedPassTitle: user?.activePassTitle,
 				userActivePassTitle: user?.activePassTitle,
 			);
 

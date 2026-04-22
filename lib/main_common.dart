@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/auth/view_model/auth_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/map/map_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/login_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/auth/view_model/auth_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile_screen.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/screens/map/map_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/pass_selection_screen.dart';
 
 Widget mainCommon(List<SingleChildWidget> appProviders) {
@@ -14,24 +14,23 @@ Widget mainCommon(List<SingleChildWidget> appProviders) {
     child: MaterialApp(
       title: 'Velo Toulouse',
       debugShowCheckedModeBanner: false,
-      home: const AuthWrapper(),
+      home: Consumer<AuthViewModel>(
+        builder: (context, authState, _) {
+          if (authState.isLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          return authState.isAuthenticated
+              ? const MainScreen()
+              : const LoginScreen();
+        },
+      ),
     ),
   );
 }
 
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final authState = context.watch<AuthViewModel>();
-    if (authState.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return authState.isAuthenticated ? const MainScreen() : const LoginScreen();
-  }
-}
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -43,11 +42,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  static const _screens = [
-    MapScreen(),
-    PassSelectionScreen(),
-    UserProfileScreen(),
-  ];
+  static const _screens = [MapScreen(), PassSelectionScreen(), UserProfileScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +107,7 @@ class _MainScreenState extends State<MainScreen> {
     required int index,
   }) {
     final isActive = _currentIndex == index;
+
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),

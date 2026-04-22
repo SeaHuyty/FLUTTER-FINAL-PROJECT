@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
 import 'package:velo_toulouse_redesign/models/ride_session.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/models/bike.dart';
-import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 
 class PassBookingViewModel extends ChangeNotifier {
-  final MapViewModel stationViewModel;
+  final StationRepository stationRepository;
   final RideSessionViewModel rideSessionProvider;
   final String stationId;
   final String stationName;
@@ -13,7 +14,7 @@ class PassBookingViewModel extends ChangeNotifier {
   final BikeModel bike;
 
   PassBookingViewModel({
-    required this.stationViewModel,
+    required this.stationRepository,
     required this.rideSessionProvider,
     required this.stationId,
     required this.stationName,
@@ -21,18 +22,19 @@ class PassBookingViewModel extends ChangeNotifier {
     required this.bike,
   });
 
-  bool isStartingRide = false;
+  AsyncValue<void> startRideState = AsyncValue.success(null);
+  bool get isStartingRide => startRideState.state == AsyncValueState.loading;
 
   Future<bool> startRide() async {
     if (isStartingRide) {
       return false;
     }
 
-    isStartingRide = true;
+    startRideState = AsyncValue.loading();
     notifyListeners();
 
     try {
-      await stationViewModel.checkoutBike(
+      await stationRepository.checkoutBike(
         stationId: stationId,
         bikeNumber: bike.plateNumber,
       );
@@ -46,12 +48,13 @@ class PassBookingViewModel extends ChangeNotifier {
         ),
       );
 
-      return true;
-    } catch (_) {
-      return false;
-    } finally {
-      isStartingRide = false;
+      startRideState = AsyncValue.success(null);
       notifyListeners();
+      return true;
+    } catch (e) {
+      startRideState = AsyncValue.error(e);
+      notifyListeners();
+      return false;
     }
   }
 }

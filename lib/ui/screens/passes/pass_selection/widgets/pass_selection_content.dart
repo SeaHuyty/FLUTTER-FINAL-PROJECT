@@ -8,7 +8,6 @@ import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/u
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 import 'package:velo_toulouse_redesign/ui/utils/date_format.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
 import 'pass_card_widget.dart';
 
@@ -34,12 +33,18 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
   }
 
   void goToPayment(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const PassPaymentScreen()));
+    final vm = context.read<PassSelectionViewModel>();
+    vm.setPurchaseDate(DateTime.now());
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PassPaymentScreen(selectedPass: vm.selectedPass),
+      ),
+    );
   }
 
   void _onSelectPass(PassSelectionViewModel vm, PassModel pass) {
     vm.selectPass(pass);
-    context.read<PassBookingProvider>().setSelectedPass(pass);
   }
 
   void _showRemovePassDialog(BuildContext context) {
@@ -61,7 +66,7 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
               await context.read<UserViewModel>().removeActivePass();
 
               if (!context.mounted) return;
-              context.read<PassBookingProvider>().setSelectedPass(null);
+              context.read<PassSelectionViewModel>().clearSelection();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Pass removed successfully')),
               );
