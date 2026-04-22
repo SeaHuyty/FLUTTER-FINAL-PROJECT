@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/ride_session_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/auth_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/viewmodels/ride_history_viewmodel.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride/active_ride_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/auth/view_model/auth_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride_screen.dart';
 import 'package:velo_toulouse_redesign/main_common.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/payment_info_card_widget.dart';
@@ -24,7 +24,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rideSession = context.watch<RideSessionProvider>().session;
+    final rideSession = context.watch<RideSessionViewModel>().session;
     final selectedPass = context.watch<PassBookingProvider>().selectedPass;
 
     if (rideSession == null && selectedPass == null) {
@@ -73,7 +73,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
                   ? null
                   : () async {
                       final currentRideSession = rideSession;
-                      final authUser = context.read<AuthProvider>().user;
+                      final authUser = context.read<AuthViewModel>().user;
 
                       if (authUser == null || currentRideSession == null) {
                         return;
@@ -99,7 +99,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
 
                           if (history != null) {
                             if (!context.mounted) return;
-                            context.read<RideSessionProvider>().setSession(
+                            context.read<RideSessionViewModel>().setSession(
                               currentRideSession.copyWith(
                                 sessionId: history.id,
                                 userId: history.userId,

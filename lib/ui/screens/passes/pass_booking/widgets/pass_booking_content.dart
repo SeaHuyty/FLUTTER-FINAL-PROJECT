@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_booking/view_model/pass_booking_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride/active_ride_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride_screen.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';

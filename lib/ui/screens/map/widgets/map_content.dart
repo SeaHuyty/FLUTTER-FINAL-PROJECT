@@ -6,7 +6,7 @@ import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/widgets/station_bottom_sheet_widget.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';

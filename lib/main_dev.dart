@@ -14,13 +14,13 @@ import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/view_model/pass_payment_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_selection_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/viewmodels/ride_history_viewmodel.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/ui/utils/firebase_options.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/auth_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/auth/view_model/auth_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/ride_session_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 
 final List<SingleChildWidget> devProviders = [
 	Provider<UserRepository>(create: (_) => UserFirebaseRepository()),
@@ -28,9 +28,9 @@ final List<SingleChildWidget> devProviders = [
 	Provider<RideHistoryRepository>(
 		create: (_) => RideHistoryFirebaseRepository(),
 	),
-	ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
+	ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
 	ChangeNotifierProvider<PassBookingProvider>(create: (_) => PassBookingProvider()),
-	ChangeNotifierProvider<RideSessionProvider>(create: (_) => RideSessionProvider()),
+	ChangeNotifierProvider<RideSessionViewModel>(create: (_) => RideSessionViewModel()),
 	ChangeNotifierProvider<MapViewModel>(create: (_) => MapViewModel()),
 	ChangeNotifierProvider<PassSelectionViewModel>(
 		create: (context) => PassSelectionViewModel(
@@ -47,7 +47,7 @@ final List<SingleChildWidget> devProviders = [
 			);
 		},
 	),
-	ChangeNotifierProxyProvider2<UserRepository, AuthProvider, UserViewModel>(
+	ChangeNotifierProxyProvider2<UserRepository, AuthViewModel, UserViewModel>(
 		create: (context) => UserViewModel(repository: context.read<UserRepository>()),
 		update: (context, userRepository, authProvider, userViewModel) {
 			final vm =
@@ -64,7 +64,7 @@ final List<SingleChildWidget> devProviders = [
 			return vm;
 		},
 	),
-	ChangeNotifierProxyProvider2<RideHistoryRepository, AuthProvider, RideHistoryViewModel>(
+	ChangeNotifierProxyProvider2<RideHistoryRepository, AuthViewModel, RideHistoryViewModel>(
 		create: (context) => RideHistoryViewModel(
 			repository: context.read<RideHistoryRepository>(),
 		),

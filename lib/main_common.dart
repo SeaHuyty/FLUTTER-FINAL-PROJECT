@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:velo_toulouse_redesign/ui/screens/splash/splash_screen.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/auth_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/auth/view_model/auth_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/map_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/auth/login/login_screen.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile/user_profile_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/auth/login_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/user_profile_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/pass_selection_screen.dart';
 
 Widget mainCommon(List<SingleChildWidget> appProviders) {
@@ -25,14 +24,12 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.watch<AuthProvider>();
+    final authState = context.watch<AuthViewModel>();
     if (authState.isLoading) {
-      return const SplashScreen();
+      return const Center(child: CircularProgressIndicator());
     }
 
-    return authState.isAuthenticated
-        ? const MainScreen()
-        : const LoginScreen();
+    return authState.isAuthenticated ? const MainScreen() : const LoginScreen();
   }
 }
 

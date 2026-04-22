@@ -4,7 +4,7 @@ import 'package:velo_toulouse_redesign/models/pass.dart';
 import 'package:velo_toulouse_redesign/models/user.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/pass_payment_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_selection_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 import 'package:velo_toulouse_redesign/ui/utils/date_format.dart';

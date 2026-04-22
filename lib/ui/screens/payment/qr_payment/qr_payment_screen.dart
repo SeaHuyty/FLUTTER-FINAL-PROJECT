@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
 import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/ride_session_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/success_payment/success_payment_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/widgets/payment_amount_breakdown.dart';
@@ -67,7 +67,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (selectedPass != null) {
         context.read<PassViewModel>().purchasePass(selectedPass);
       } else {
-        final currentRide = context.read<RideSessionProvider>().session;
+        final currentRide = context.read<RideSessionViewModel>().session;
         if (currentRide?.fromStationId != null) {
           try {
             await context.read<StationRepository>().checkoutBike(
@@ -100,7 +100,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rideSession = context.watch<RideSessionProvider>().session;
+    final rideSession = context.watch<RideSessionViewModel>().session;
     final selectedPass = context.watch<PassBookingProvider>().selectedPass;
 
     if (rideSession == null && selectedPass == null) {

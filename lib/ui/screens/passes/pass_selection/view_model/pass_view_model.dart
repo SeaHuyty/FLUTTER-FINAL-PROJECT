@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:velo_toulouse_redesign/models/pass.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/viewmodels/user_viewmodel.dart';
+import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/utils/date_format.dart';
 import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
 

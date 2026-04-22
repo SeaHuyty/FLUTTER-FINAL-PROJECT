@@ -1,56 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:velo_toulouse_redesign/ui/viewmodels/ride_session_view_model.dart';
+import 'package:velo_toulouse_redesign/models/ride_session.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/models/bike.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
 
 class PassBookingViewModel extends ChangeNotifier {
-	final MapViewModel stationViewModel;
-	final RideSessionProvider rideSessionProvider;
-	final String stationId;
-	final String stationName;
-	final String stationAddress;
-	final BikeModel bike;
+  final MapViewModel stationViewModel;
+  final RideSessionViewModel rideSessionProvider;
+  final String stationId;
+  final String stationName;
+  final String stationAddress;
+  final BikeModel bike;
 
-	PassBookingViewModel({
-		required this.stationViewModel,
-		required this.rideSessionProvider,
-		required this.stationId,
-		required this.stationName,
-		required this.stationAddress,
-		required this.bike,
-	});
+  PassBookingViewModel({
+    required this.stationViewModel,
+    required this.rideSessionProvider,
+    required this.stationId,
+    required this.stationName,
+    required this.stationAddress,
+    required this.bike,
+  });
 
-	bool isStartingRide = false;
+  bool isStartingRide = false;
 
-	Future<bool> startRide() async {
-		if (isStartingRide) {
-			return false;
-		}
+  Future<bool> startRide() async {
+    if (isStartingRide) {
+      return false;
+    }
 
-		isStartingRide = true;
-		notifyListeners();
+    isStartingRide = true;
+    notifyListeners();
 
-		try {
-			await stationViewModel.checkoutBike(
-				stationId: stationId,
-				bikeNumber: bike.plateNumber,
-			);
+    try {
+      await stationViewModel.checkoutBike(
+        stationId: stationId,
+        bikeNumber: bike.plateNumber,
+      );
 
-			rideSessionProvider.setSession(
-				RideSession(
-					fromStationId: stationId,
-					bikeNumber: bike.plateNumber,
-					fromStationName: stationName,
-					fromStationAddress: stationAddress,
-				),
-			);
+      rideSessionProvider.setSession(
+        RideSession(
+          fromStationId: stationId,
+          bikeNumber: bike.plateNumber,
+          fromStationName: stationName,
+          fromStationAddress: stationAddress,
+        ),
+      );
 
-			return true;
-		} catch (_) {
-			return false;
-		} finally {
-			isStartingRide = false;
-			notifyListeners();
-		}
-	}
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      isStartingRide = false;
+      notifyListeners();
+    }
+  }
 }
