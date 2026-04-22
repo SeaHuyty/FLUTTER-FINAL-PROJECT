@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
+import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/viewmodels/pass_booking_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_view_model.dart';
@@ -11,7 +11,6 @@ import 'package:velo_toulouse_redesign/ui/screens/payment/success_payment/succes
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/widgets/payment_amount_breakdown.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/widgets/qr_payment_instruction_section.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
-
 
 enum ProcessStage { initialize, paying, processing, paid }
 
@@ -64,13 +63,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     if (next == ProcessStage.paid) {
       final selectedPass = context.read<PassBookingProvider>().selectedPass;
+      
       if (selectedPass != null) {
         context.read<PassViewModel>().purchasePass(selectedPass);
       } else {
         final currentRide = context.read<RideSessionViewModel>().session;
+
         if (currentRide?.fromStationId != null) {
           try {
-            await context.read<StationRepository>().checkoutBike(
+            await context.read<MapViewModel>().checkoutBike(
               stationId: currentRide!.fromStationId!,
               bikeNumber: currentRide.bikeNumber,
             );

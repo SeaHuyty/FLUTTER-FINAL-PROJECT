@@ -4,12 +4,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/alert_dialog_modal.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/ride_summary_screen.dart';
 import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/ride_summary_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/legend_pill.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/ride_bottom_sheet.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/station_selection_card.dart';
@@ -84,7 +84,6 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
     }
 
     if (!mounted) return;
-
     if (rideSession.sessionId != null) {
       await context.read<RideHistoryViewModel>().completeRide(
         sessionId: rideSession.sessionId!,
@@ -102,7 +101,6 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
       ),
     );
 
-
     _timer.cancel();
     Navigator.pushReplacement(
       context,
@@ -113,83 +111,12 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
   }
 
   void _showDockConfirmation() {
+    if (_returnStation == null) return;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFFF4F6F3),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: const BoxDecoration(
-                color: Color(0xFF006D33),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.lock_rounded,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Confirm Return',
-              style: AppTextStyles.heading.copyWith(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF1A1A1A),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Make sure your bike is fully locked into the slot at ${_returnStation!.name} before confirming.',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.label.copyWith(
-                color: Colors.grey[500],
-                fontSize: 13,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // close dialog
-                  _onDocked(); // then navigate
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF006D33),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Yes, bike is locked',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Text(
-                'Go back',
-                style: AppTextStyles.label.copyWith(
-                  color: Colors.grey[500],
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ],
-        ),
+      builder: (_) => AlertDialogModal(
+        stationName: _returnStation!.name,
+        onConfirm: _onDocked,
       ),
     );
   }
@@ -215,7 +142,8 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
       body: Stack(
         children: [
           // ── Full screen map ───────────────────────────────────────
-          if (!stationViewModel.isLoading && stationViewModel.errorMessage == null)
+          if (!stationViewModel.isLoading &&
+              stationViewModel.errorMessage == null)
             Builder(
               builder: (_) {
                 final returnable = _returnableStations(

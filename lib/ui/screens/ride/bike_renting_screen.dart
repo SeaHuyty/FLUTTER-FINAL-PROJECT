@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/models/ride_session.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/models/bike.dart';
+import 'package:velo_toulouse_redesign/models/ride_session.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/qr_payment_screen.dart';
+import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/bottom_action_container.dart';
+import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
+
 
 class BikeRentingScreen extends StatefulWidget {
   final String stationId;

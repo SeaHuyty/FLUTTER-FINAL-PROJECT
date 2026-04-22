@@ -8,62 +8,76 @@ import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 
 class MapViewModel extends ChangeNotifier {
-	MapViewModel({StationRepository? repository}) : _repository = repository ?? StationRepositoryFirebase() {
-		unawaited(fetchStations());
-	}
+  MapViewModel({StationRepository? repository})
+    : _repository = repository ?? StationRepositoryFirebase() {
+    unawaited(fetchStations());
+  }
 
-	final StationRepository _repository;
+  final StationRepository _repository;
+  bool _isDisposed = false;
 
-	AsyncValue<List<StationModel>> stations = AsyncValue.loading();
-	BikeModel? selectedBike;
+  AsyncValue<List<StationModel>> stations = AsyncValue.loading();
+  BikeModel? selectedBike;
 
-	List<StationModel> get stationList => stations.data ?? <StationModel>[];
-	bool get isLoading => stations.state == AsyncValueState.loading;
-	String? get errorMessage =>
-			stations.state == AsyncValueState.error ? stations.error.toString() : null;
+  List<StationModel> get stationList => stations.data ?? <StationModel>[];
+  bool get isLoading => stations.state == AsyncValueState.loading;
+  String? get errorMessage => stations.state == AsyncValueState.error
+      ? stations.error.toString()
+      : null;
 
-	Future<void> fetchStations() async {
-		stations = AsyncValue.loading();
-		notifyListeners();
+  void _safeNotify() {
+    if (_isDisposed) return;
+    notifyListeners();
+  }
 
-		try {
-			final result = await _repository.getStations();
-			stations = AsyncValue.success(result);
-		} catch (e) {
-			stations = AsyncValue.error(e);
-		}
+  Future<void> fetchStations() async {
+    stations = AsyncValue.loading();
+    _safeNotify();
 
-		notifyListeners();
-	}
+    try {
+      final result = await _repository.getStations();
+      stations = AsyncValue.success(result);
+    } catch (e) {
+      stations = AsyncValue.error(e);
+    }
 
-	Future<void> checkoutBike({
-		required String stationId,
-		required String bikeNumber,
-	}) async {
-		await _repository.checkoutBike(
-			stationId: stationId,
-			bikeNumber: bikeNumber,
-		);
-		await fetchStations();
-	}
+    _safeNotify();
+  }
 
-	Future<void> dockBike({
-		required String stationId,
-		required String bikeNumber,
-	}) async {
-		await _repository.dockBike(stationId: stationId, bikeNumber: bikeNumber);
-		await fetchStations();
-	}
+  Future<void> checkoutBike({
+    required String stationId,
+    required String bikeNumber,
+  }) async {
+    await _repository.checkoutBike(
+      stationId: stationId,
+      bikeNumber: bikeNumber,
+    );
+    await fetchStations();
+  }
 
-	void setBike(BikeModel bike) {
-		selectedBike = bike;
-		notifyListeners();
-	}
+  Future<void> dockBike({
+    required String stationId,
+    required String bikeNumber,
+  }) async {
+    await _repository.dockBike(stationId: stationId, bikeNumber: bikeNumber);
+    await fetchStations();
+  }
 
-	String? resolveActivePassTitle({
-		required String? selectedPassTitle,
-		required String? userActivePassTitle,
-	}) {
-		return selectedPassTitle ?? userActivePassTitle;
-	}
+  void setBike(BikeModel bike) {
+    selectedBike = bike;
+    _safeNotify();
+  }
+
+  String? resolveActivePassTitle({
+    required String? selectedPassTitle,
+    required String? userActivePassTitle,
+  }) {
+    return selectedPassTitle ?? userActivePassTitle;
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
 }
