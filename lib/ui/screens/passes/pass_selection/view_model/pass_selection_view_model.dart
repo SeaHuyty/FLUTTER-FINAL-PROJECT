@@ -6,21 +6,22 @@ import 'package:velo_toulouse_redesign/ui/utils/date_format.dart';
 
 class PassSelectionViewModel extends ChangeNotifier {
   final PassRepository repository;
-  bool _isDisposed = false;
 
   PassSelectionViewModel(this.repository);
 
   AsyncValue<List<PassModel>> passes = AsyncValue.loading();
   PassModel? selectedPass;
 
-  void _safeNotify() {
-    if (_isDisposed) return;
-    notifyListeners();
-  }
+    String get activePassBannerMessage => 'You already have an active pass. You cannot purchase a new one until it expires.';
+    String get removePassDialogTitle => 'Remove Pass';
+    String get removePassDialogContent => 'Are you sure you want to remove your active pass?';
+    String get removePassSuccessMessage => 'Pass removed successfully';
+    String get passesLoadErrorMessage => 'Error loading passes';
+    String get continueToPaymentText => 'Continue to Payment';
 
   Future<void> fetchPasses() async {
     passes = AsyncValue.loading();
-    _safeNotify();
+    notifyListeners();
 
     try {
       final result = await repository.getPasses();
@@ -29,7 +30,7 @@ class PassSelectionViewModel extends ChangeNotifier {
       passes = AsyncValue.error(e);
     }
 
-    _safeNotify();
+    notifyListeners();
   }
 
   bool hasActivePass(String? activePassExpiry) {
@@ -38,12 +39,11 @@ class PassSelectionViewModel extends ChangeNotifier {
 
   void selectPass(PassModel pass) {
     selectedPass = pass;
-    _safeNotify();
+    notifyListeners();
   }
 
-  @override
-  void dispose() {
-    _isDisposed = true;
-    super.dispose();
+  void clearSelection() {
+    selectedPass = null;
+    notifyListeners();
   }
 }

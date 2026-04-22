@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/models/pass.dart';
-import 'package:velo_toulouse_redesign/models/user.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/pass_payment_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_selection/view_model/pass_selection_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
-import 'package:velo_toulouse_redesign/ui/utils/date_format.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
+import 'active_pass_tile.dart';
 import 'pass_card_widget.dart';
 
 class PassSelectionContent extends StatefulWidget {
@@ -19,26 +18,31 @@ class PassSelectionContent extends StatefulWidget {
 }
 
 class _PassSelectionContentState extends State<PassSelectionContent> {
-  void _fetchPasses() {
-    context.read<PassSelectionViewModel>().fetchPasses();
-  }
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _fetchPasses();
+
+      final passVm = context.read<PassSelectionViewModel>();
+      passVm.fetchPasses();
+
+      final userVm = context.read<UserViewModel>();
+      if (userVm.user == null && !userVm.isLoading) {
+        userVm.loadCurrentUser();
+      }
     });
   }
 
-  void goToPayment(BuildContext context) {
+  void _goToPayment(BuildContext context) {
     final vm = context.read<PassSelectionViewModel>();
-    vm.setPurchaseDate(DateTime.now());
+    final selectedPass = vm.selectedPass;
+    if (selectedPass == null) return;
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PassPaymentScreen(selectedPass: vm.selectedPass),
+        builder: (_) => PassPaymentScreen(selectedPass: selectedPass),
       ),
     );
   }
@@ -48,27 +52,31 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
   }
 
   void _showRemovePassDialog(BuildContext context) {
+    final userViewModel = context.read<UserViewModel>();
+    final passSelectionViewModel = context.read<PassSelectionViewModel>();
+    final messenger = ScaffoldMessenger.of(context);
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Pass'),
-        content: const Text(
-          'Are you sure you want to remove your active pass?',
-        ),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(passSelectionViewModel.removePassDialogTitle),
+        content: Text(passSelectionViewModel.removePassDialogContent),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
-              await context.read<UserViewModel>().removeActivePass();
+              Navigator.pop(dialogContext);
+              await userViewModel.removeActivePass();
 
-              if (!context.mounted) return;
-              context.read<PassSelectionViewModel>().clearSelection();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Pass removed successfully')),
+              if (!mounted) return;
+              passSelectionViewModel.clearSelection();
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text(passSelectionViewModel.removePassSuccessMessage),
+                ),
               );
             },
             child: const Text('Remove', style: TextStyle(color: Colors.red)),
@@ -78,96 +86,77 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
     );
   }
 
-  Widget _buildPassInfoCard(BuildContext context, UserModel user) {
-    final parsedExpiry = DateFormatter.tryParseIsoDate(user.activePassExpiry);
-    final expiryText =
-        parsedExpiry == null ? 'N/A' : DateFormatter.formatPassExpiry(parsedExpiry);
+  Widget _buildActivePassBanner() {
+    final vm = context.read<PassSelectionViewModel>();
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      height: 60,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+				color: const Color.fromARGB(255, 172, 175, 172),
+        borderRadius: BorderRadius.circular(12), 
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Active Pass',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white),
-                onSelected: (value) {
-                  if (value == 'remove') {
-                    _showRemovePassDialog(context);
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'remove',
-                    child: Text('Remove Pass'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            user.activePassTitle ?? 'No Pass',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.timer_outlined, color: Colors.white, size: 16),
-                const SizedBox(width: 6),
-                Text(
-                  'Expires: $expiryText',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+          const Icon(Icons.info_outline, color: Colors.white),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              vm.activePassBannerMessage,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],
       ),
     );
   }
+  
+  Widget _buildPassSelectionList(PassSelectionViewModel vm) {
+    final passes = vm.passes.data ?? [];
+
+    return Stack(
+      children: [
+        ListView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 180),
+          itemCount: passes.length,
+          itemBuilder: (context, index) {
+            final pass = passes[index];
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: PassCardWidget(
+                pass: pass,
+                description: 'Valid for ${pass.duration}',
+                icon: Icons.calendar_today_outlined,
+                isSelected: vm.selectedPass?.id == pass.id,
+                onTap: () => _onSelectPass(vm, pass),
+              ),
+            );
+          },
+        ),
+        Positioned(
+          bottom: 100,
+          left: 16,
+          right: 16,
+          child: VeloButton(
+            text: vm.continueToPaymentText,
+            onPressed: vm.selectedPass == null ? null : () => _goToPayment(context),
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<PassSelectionViewModel>();
-    final user = context.watch<UserViewModel>().user;
+    final userVm = context.watch<UserViewModel>();
+    final user = userVm.user;
+
+    if (userVm.isLoading && user == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     final hasActivePass = vm.hasActivePass(user?.activePassExpiry);
 
@@ -182,100 +171,28 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 24),
           child: Column(
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                color: AppColors.primaryColor,
-                child: const Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.white),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'You already have an active pass. You cannot purchase a new one until it expires.',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
+              _buildActivePassBanner(),
+              const SizedBox(height: 50),
+              ActivePassTile(
+                user: user,
+                onRemove: () => _showRemovePassDialog(context),
               ),
-              const SizedBox(height: 16),
-              _buildPassInfoCard(context, user),
             ],
           ),
         ),
       );
     }
 
-    Widget body;
-    if (vm.passes.state == AsyncValueState.loading) {
-      body = const Center(child: CircularProgressIndicator());
-    } else if (vm.passes.state == AsyncValueState.error) {
-      body = const Center(child: Text('Error loading passes'));
-    } else {
-      final passes = vm.passes.data ?? [];
-
-      body = Stack(
-        children: [
-          ListView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 180),
-            itemCount: passes.length,
-            itemBuilder: (context, index) {
-              final pass = passes[index];
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: PassCardWidget(
-                  pass: pass,
-                  description: 'Valid for ${pass.duration}',
-                  icon: Icons.calendar_today_outlined,
-                  isSelected: vm.selectedPass?.id == pass.id,
-                  onTap: hasActivePass ? () {} : () => _onSelectPass(vm, pass),
-                ),
-              );
-            },
-          ),
-          Positioned(
-            bottom: 100,
-            left: 16,
-            right: 16,
-            child: VeloButton(
-              text: hasActivePass ? 'Pass Already Active' : 'Continue to Payment',
-              onPressed: (hasActivePass || vm.selectedPass == null)
-                  ? null
-                  : () => goToPayment(context),
-            ),
-          ),
-          if (hasActivePass)
-            Positioned(
-              top: 490,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                color: AppColors.primaryColor,
-                child: const Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.white),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'You already have an active pass.',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      );
-    }
+    final Widget body = switch (vm.passes.state) {
+      AsyncValueState.loading => const Center(child: CircularProgressIndicator()),
+      AsyncValueState.error => Center(child: Text(vm.passesLoadErrorMessage)),
+      AsyncValueState.success => _buildPassSelectionList(vm),
+    };
 
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        title: const Center(child: Text("Select a Pass")),
+        title: const Center(child: Text('Select a Pass')),
         backgroundColor: Colors.white,
       ),
       body: body,

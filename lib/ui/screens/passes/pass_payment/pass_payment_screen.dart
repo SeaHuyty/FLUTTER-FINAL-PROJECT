@@ -12,10 +12,7 @@ class PassPaymentScreen extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		return ChangeNotifierProvider(
-			create: (context) =>
-				PassPaymentViewModel(
-					initialSelectedPass: selectedPass,
-				)..loadSelectedPass(),
+			create: (context) => PassPaymentViewModel(selectedPass: selectedPass),
 			child: const PassPaymentContent(),
 		);
 	}

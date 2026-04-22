@@ -9,7 +9,6 @@ import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/ride/ride_summary_screen.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/legend_pill.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/ride_bottom_sheet.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/station_selection_card.dart';
@@ -95,21 +94,11 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
     }
 
     if (!mounted) return;
-    context.read<RideSessionViewModel>().setSession(
-      rideSession.copyWith(
-        returnStationName: _returnStation!.name,
-        returnStationAddress: _returnStation!.address,
-      ),
-    );
+    context.read<RideSessionViewModel>().clear();
 
 
     _timer.cancel();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => RideSummaryScreen(secondsElapsed: _secondsElapsed),
-      ),
-    );
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   void _showDockConfirmation() {

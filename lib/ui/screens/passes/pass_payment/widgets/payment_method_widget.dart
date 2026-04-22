@@ -28,12 +28,23 @@ class PaymentMethodWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            "Use code RONAN-THE-BEST to get up to 50% off",
-            style: TextStyle(
-              fontSize: 24,
-              color: AppColors.darkGreen,
-              fontWeight: FontWeight.w600
+          Text.rich(
+            TextSpan(
+              children: [
+                const TextSpan(text: "Use code "),
+                TextSpan(
+                  text: "RONAN-THE-BEST",
+                  style: TextStyle(
+                    color: AppColors.brown,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const TextSpan(text: " to get up to 50% off"),
+              ],
+            ),
+            style: const TextStyle(
+              color: Colors.black54,
+              fontSize: 20,
             ),
           ),
           const SizedBox(height: 16),

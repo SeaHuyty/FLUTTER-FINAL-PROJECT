@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/view_model/pass_payment_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/view_model/auth_view_model.dart';
-import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/active_ride_screen.dart';
 import 'package:velo_toulouse_redesign/main_common.dart';
@@ -25,11 +24,12 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     final rideSession = context.watch<RideSessionViewModel>().session;
-    final selectedPass = context.watch<PassPaymentViewModel>().selectedPass;
+    final passPaymentViewModel = context.watch<PassPaymentViewModel?>();
+    final selectedPass = passPaymentViewModel?.selectedPass;
 
     if (rideSession == null && selectedPass == null) {
       return const Scaffold(
-        body: Center(child: Text('No active ride sessionfound.')),
+        body: Center(child: Text('No active payment flow found.')),
       );
     }
 
@@ -54,9 +54,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
               const SizedBox(height: 30),
               PaymentInfoCardWidget(
                 pass: selectedPass,
-                expiryDate: context.read<PassPaymentViewModel>().getExpiryDate(
-                  context.read<UserViewModel>().user?.activePassExpiry,
-                ),
+                expiryDate: passPaymentViewModel?.expiryText ?? 'N/A',
               ),
             ],
             const SizedBox(height: 50),

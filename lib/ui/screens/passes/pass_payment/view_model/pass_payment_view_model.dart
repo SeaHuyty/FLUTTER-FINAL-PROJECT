@@ -5,74 +5,75 @@ import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 import 'package:velo_toulouse_redesign/ui/utils/date_format.dart';
 
 class PassPaymentViewModel extends ChangeNotifier {
-	final PassModel? initialSelectedPass;
-	DateTime? _expiryDate;
+  PassPaymentViewModel({required this.selectedPass});
 
-	PassPaymentViewModel({required this.initialSelectedPass});
+  final PassModel? selectedPass;
+  DateTime? _expiryDate;
+  AsyncValue<void> purchaseState = AsyncValue.success(null);
 
-	AsyncValue<PassModel?> selectedPassState = AsyncValue.success(null);
+  PassModel? get pass => selectedPass;
+  DateTime? get expiryDate => _expiryDate;
+  bool get isSaving => purchaseState.state == AsyncValueState.loading;
+  bool get canPay => selectedPass != null;
+  String get noPassSelectedMessage => 'No pass selected';
+  String get payNowButtonText => 'Pay now';
+  String get expiryText {
+    final expiry = _expiryDate ?? _projectedExpiryDate;
+    if (expiry == null) return 'N/A';
+    return DateFormatter.formatPassExpiry(expiry);
+  }
 
-	PassModel? get selectedPass => selectedPassState.data;
-	DateTime? get expiryDate => _expiryDate;
-	bool get isLoading => selectedPassState.state == AsyncValueState.loading;
-	bool get hasError => selectedPassState.state == AsyncValueState.error;
-	bool get canPay => selectedPass != null;
+  DateTime? get _projectedExpiryDate {
+    final pass = selectedPass;
+    if (pass == null) return null;
+    return DateTime.now().add(calculateDuration(pass.duration));
+  }
 
-	void loadSelectedPass() {
-		selectedPassState = AsyncValue.success(initialSelectedPass);
-		notifyListeners();
-	}
+  Future<void> completePassPurchase(UserViewModel userViewModel) async {
+    final pass = selectedPass;
+    if (pass == null) return;
 
-	Future<void> completePassPurchase(UserViewModel userViewModel) async {
-		final pass = selectedPass;
-		if (pass == null) return;
+    purchaseState = AsyncValue.loading();
+    notifyListeners();
 
-		final now = DateTime.now();
-		final expiry = now.add(_durationFromPass(pass.duration));
-		_expiryDate = expiry;
+    try {
+      final expiry = DateTime.now().add(calculateDuration(pass.duration));
+      _expiryDate = expiry;
 
-		final user = userViewModel.user;
-		if (user != null) {
-			final updatedUser = user.copyWith(
-				activePassId: pass.id,
-				activePassTitle: pass.title,
-				activePassExpiry: expiry.toIso8601String(),
-			);
-			await userViewModel.updateUserProfile(updatedUser);
-		}
+      final user = userViewModel.user;
+      if (user != null) {
+        final updatedUser = user.copyWith(
+          activePassId: pass.id,
+          activePassTitle: pass.title,
+          activePassExpiry: expiry.toIso8601String(),
+        );
+        await userViewModel.updateUserProfile(updatedUser);
+      }
+      purchaseState = AsyncValue.success(null);
+    } catch (e) {
+      purchaseState = AsyncValue.error(e);
+      rethrow;
+    } finally {
+      notifyListeners();
+    }
+  }
 
-		notifyListeners();
-	}
+ Duration calculateDuration(String rawDuration) {
+  final parts = rawDuration.toLowerCase().split(' ');
+  
+  final int value = int.tryParse(parts[0]) ?? 1;
+  
+    if (rawDuration.contains('year')) {
+    return Duration(days: value * 365);
 
-	String getExpiryDate([String? activePassExpiry]) {
-		if (_expiryDate != null) {
-			return DateFormatter.formatPassExpiry(_expiryDate!);
-		}
+  } else if (rawDuration.contains('month')) {
+    return Duration(days: value * 30);
 
-		final parsed = DateFormatter.tryParseIsoDate(activePassExpiry);
-		if (parsed == null) {
-			return 'N/A';
-		}
+  } else if (rawDuration.contains('week')) {
+    return Duration(days: value * 7);
 
-		return DateFormatter.formatPassExpiry(parsed);
-	}
-
-	Duration _durationFromPass(String rawDuration) {
-		final value = int.tryParse(
-				  RegExp(r'\d+').firstMatch(rawDuration)?.group(0) ?? '',
-				) ??
-				1;
-
-		final duration = rawDuration.toLowerCase();
-		if (duration.contains('month')) {
-			return Duration(days: value * 30);
-		}
-		if (duration.contains('week')) {
-			return Duration(days: value * 7);
-		}
-    if (duration.contains('year')) {
-			return Duration(days: value * 365);
-		}
-		return Duration(days: value);
-	}
+  } else {
+    return Duration(days: value);
+  }
+}
 }

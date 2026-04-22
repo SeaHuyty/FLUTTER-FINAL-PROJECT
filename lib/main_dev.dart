@@ -14,11 +14,11 @@ import 'package:velo_toulouse_redesign/data/repositories/users/user_repository.d
 import 'package:velo_toulouse_redesign/main_common.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/auth/view_model/auth_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/ui/utils/firebase_options.dart';
-
 
 final List<SingleChildWidget> devProviders = [
   // Repositories
@@ -33,23 +33,35 @@ final List<SingleChildWidget> devProviders = [
   ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
   ChangeNotifierProvider<RideSessionViewModel>(create: (_) => RideSessionViewModel()),
 
+  ChangeNotifierProvider<MapViewModel>(
+    create: (context) => MapViewModel(
+      repository: context.read<StationRepository>(),
+    ),
+  ),
+
   // ViewModels
-  ChangeNotifierProvider<UserViewModel>(
-    create: (context) {
-      final vm = UserViewModel(
+  ChangeNotifierProxyProvider<AuthViewModel, UserViewModel>(
+    create: (context) => UserViewModel(
+      repository: context.read<UserRepository>(),
+    ),
+    update: (context, authVm, userVm) {
+      final vm = userVm ?? UserViewModel(
         repository: context.read<UserRepository>(),
       );
-      vm.onAuthUserChanged(context.read<AuthViewModel>().user);
+      vm.onAuthUserChanged(authVm.user);
       return vm;
     },
   ),
 
-  ChangeNotifierProvider<RideHistoryViewModel>(
-    create: (context) {
-      final vm = RideHistoryViewModel(
+  ChangeNotifierProxyProvider<AuthViewModel, RideHistoryViewModel>(
+    create: (context) => RideHistoryViewModel(
+      repository: context.read<RideHistoryRepository>(),
+    ),
+    update: (context, authVm, historyVm) {
+      final vm = historyVm ?? RideHistoryViewModel(
         repository: context.read<RideHistoryRepository>(),
       );
-      vm.onAuthUserChanged(context.read<AuthViewModel>().user);
+      vm.onAuthUserChanged(authVm.user);
       return vm;
     },
   ),
@@ -61,7 +73,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
 
   if (AppConfig.mapboxToken.isEmpty) {
     throw Exception('Missing MAPBOX_ACCESS_TOKEN in .env file');

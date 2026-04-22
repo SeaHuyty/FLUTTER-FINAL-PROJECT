@@ -17,14 +17,9 @@ class PassBookingContent extends StatelessWidget {
 		}
 
 		if (!started) {
-			final errorText = vm.startRideState.error?.toString();
 			ScaffoldMessenger.of(context).showSnackBar(
 				SnackBar(
-					content: Text(
-						errorText == null || errorText.isEmpty
-							? 'Could not unlock bike. Please try again.'
-							: errorText,
-					),
+					content: Text(vm.startRideErrorMessage),
 				),
 			);
 			return;
@@ -33,6 +28,33 @@ class PassBookingContent extends StatelessWidget {
 		Navigator.push(
 			context,
 			MaterialPageRoute(builder: (_) => const ActiveRideScreen()),
+		);
+	}
+
+	Widget _buildActivePassCard(PassBookingViewModel vm) {
+		return Container(
+			width: double.infinity,
+			padding: const EdgeInsets.all(14),
+			decoration: BoxDecoration(
+				color: const Color.fromARGB(255, 183, 206, 184),
+				borderRadius: BorderRadius.circular(26),
+			),
+			child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+				children: [
+					const Icon(Icons.check_circle_outline, color: Colors.white),
+					const SizedBox(width: 30),
+					Expanded(
+						child: Text(
+							vm.activePassMessage,
+							style: const TextStyle(
+								color: Colors.blueGrey,
+								fontWeight: FontWeight.w600,
+							),
+						),
+					),
+				],
+			),
 		);
 	}
 
@@ -182,10 +204,12 @@ class PassBookingContent extends StatelessWidget {
 								],
 							),
 						),
-						const SizedBox(height: 250),
+						const SizedBox(height: 50),
+						_buildActivePassCard(vm),
+						const SizedBox(height: 70),
 						Center(
 							child: VeloButton(
-								text: 'Start Riding',
+								text: vm.startRideButtonText,
 								onPressed: vm.isStartingRide
 									? null
 									: () => _onStartRide(context, vm),

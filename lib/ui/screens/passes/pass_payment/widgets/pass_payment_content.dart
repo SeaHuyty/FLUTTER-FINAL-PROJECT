@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/view_model/pass_payment_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/widgets/payment_method_widget.dart';
 import 'package:velo_toulouse_redesign/ui/screens/payment/qr_payment/qr_payment_screen.dart';
-import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/actions/button.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
 import 'package:velo_toulouse_redesign/ui/widgets/display/payment_info_card_widget.dart';
@@ -27,21 +26,18 @@ class PassPaymentContent extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		final vm = context.watch<PassPaymentViewModel>();
-		final selectedPass = vm.selectedPass;
+		final selectedPass = vm.pass;
 
 		Widget body;
-		if (vm.selectedPassState.state == AsyncValueState.loading) {
-			body = const Center(child: CircularProgressIndicator());
-		} else if (vm.selectedPassState.state == AsyncValueState.error) {
-			body = const Center(child: Text('Error loading selected pass'));
-		} else if (selectedPass == null) {
-			body = const Center(child: Text('No pass selected'));
+		if (selectedPass == null) {
+			body = Center(child: Text(vm.noPassSelectedMessage));
 		} else {
 			body = Column(
 				children: [
-					const SizedBox(height: 10),
-					PaymentInfoCardWidget(pass: selectedPass),
-					const SizedBox(height: 20),
+					PaymentInfoCardWidget(
+						pass: selectedPass,
+						expiryDate: vm.expiryText,
+					),
 					Container(
 						padding: const EdgeInsets.only(
 							top: 20,
@@ -56,10 +52,10 @@ class PassPaymentContent extends StatelessWidget {
 						child: Column(
 							children: [
 								const PaymentMethodWidget(),
+								
 								const SizedBox(height: 30),
-								const SizedBox(height: 20),
 								VeloButton(
-									text: 'Pay now',
+									text: vm.payNowButtonText,
 									onPressed: vm.canPay ? () => _goToPayment(context) : null,
 								),
 							],

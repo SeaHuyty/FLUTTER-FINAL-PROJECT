@@ -18,7 +18,7 @@ class PaymentInfoCardWidget extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 35, 104, 37),
+        color: const Color.fromARGB(255, 53, 139, 56),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -70,10 +70,10 @@ class PaymentInfoCardWidget extends StatelessWidget {
               ),
             ],
           ),
-          
-            Divider(
-              color: AppColors.white.withValues(alpha: 0.3),
-              thickness: 3,
+
+          Divider(
+            color: AppColors.white.withValues(alpha: 0.3),
+            thickness: 3,
           ),
 
           const SizedBox(height: 20),
@@ -96,8 +96,8 @@ class PaymentInfoCardWidget extends StatelessWidget {
             ],
           ),
 
-           if (expiryDate != null) ...[
-             Divider(
+          if (expiryDate != null && expiryDate!.isNotEmpty) ...[
+            Divider(
                 color: AppColors.white.withValues(alpha: 0.3),
                 thickness: 3,
             ),
@@ -111,8 +111,7 @@ class PaymentInfoCardWidget extends StatelessWidget {
               ),
             ),
           ],
-          
-          
+
           const SizedBox(height: 16),
         ],
       ),
