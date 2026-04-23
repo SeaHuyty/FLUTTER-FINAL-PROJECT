@@ -15,10 +15,8 @@ class ActivePassTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parsedExpiry = DateFormatter.tryParseIsoDate(user.activePassExpiry);
-    final expiryText = parsedExpiry == null
-        ? 'N/A'
-        : DateFormatter.formatPassExpiry(parsedExpiry);
+    final parsedExpiry = DateFormatter.parseDate(user.activePassExpiry);
+    final expiryText = parsedExpiry == null ? 'N/A' : DateFormatter.formatPassExpiry(parsedExpiry);
 
     return Container(
       width: double.infinity,

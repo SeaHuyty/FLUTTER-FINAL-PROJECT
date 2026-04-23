@@ -10,8 +10,7 @@ class PassSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) =>
-          PassSelectionViewModel(context.read<PassRepository>()),
+      create: (context) => PassSelectionViewModel(context.read<PassRepository>()),
       child: const PassSelectionContent(),
     );
   }

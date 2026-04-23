@@ -10,7 +10,7 @@ import 'package:velo_toulouse_redesign/ui/widgets/display/payment_info_card_widg
 class PassPaymentContent extends StatelessWidget {
 	const PassPaymentContent({super.key});
 
-	void _goToPayment(BuildContext context) {
+	void goToPayment(BuildContext context) {
 		final vm = context.read<PassPaymentViewModel>();
 		Navigator.push(
 			context,
@@ -30,7 +30,7 @@ class PassPaymentContent extends StatelessWidget {
 
 		Widget body;
 		if (selectedPass == null) {
-			body = Center(child: Text(vm.noPassSelectedMessage));
+			body = const Center(child: Text('No pass selected'));
 		} else {
 			body = Column(
 				children: [
@@ -55,8 +55,8 @@ class PassPaymentContent extends StatelessWidget {
 								
 								const SizedBox(height: 30),
 								VeloButton(
-									text: vm.payNowButtonText,
-									onPressed: vm.canPay ? () => _goToPayment(context) : null,
+									text: 'Pay now',
+									onPressed: vm.canPay ? () => goToPayment(context) : null,
 								),
 							],
 						),

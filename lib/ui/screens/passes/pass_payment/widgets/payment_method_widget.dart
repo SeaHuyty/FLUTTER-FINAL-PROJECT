@@ -39,7 +39,7 @@ class PaymentMethodWidget extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const TextSpan(text: " to get up to 50% off"),
+                const TextSpan(text: " to get up to 70% off"),
               ],
             ),
             style: const TextStyle(

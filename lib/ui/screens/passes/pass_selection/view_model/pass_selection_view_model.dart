@@ -9,16 +9,6 @@ class PassSelectionViewModel extends ChangeNotifier {
 
   PassSelectionViewModel(this.repository);
 
-  AsyncValue<List<PassModel>> passes = AsyncValue.loading();
-  PassModel? selectedPass;
-
-    String get activePassBannerMessage => 'You already have an active pass. You cannot purchase a new one until it expires.';
-    String get removePassDialogTitle => 'Remove Pass';
-    String get removePassDialogContent => 'Are you sure you want to remove your active pass?';
-    String get removePassSuccessMessage => 'Pass removed successfully';
-    String get passesLoadErrorMessage => 'Error loading passes';
-    String get continueToPaymentText => 'Continue to Payment';
-
   Future<void> fetchPasses() async {
     passes = AsyncValue.loading();
     notifyListeners();
@@ -29,13 +19,11 @@ class PassSelectionViewModel extends ChangeNotifier {
     } catch (e) {
       passes = AsyncValue.error(e);
     }
-
     notifyListeners();
   }
 
-  bool hasActivePass(String? activePassExpiry) {
-    return DateFormatter.isFutureDate(activePassExpiry);
-  }
+  AsyncValue<List<PassModel>> passes = AsyncValue.loading();
+  PassModel? selectedPass;
 
   void selectPass(PassModel pass) {
     selectedPass = pass;
@@ -45,5 +33,9 @@ class PassSelectionViewModel extends ChangeNotifier {
   void clearSelection() {
     selectedPass = null;
     notifyListeners();
+  }
+
+  bool hasActivePass(String? activePassExpiry) {
+    return DateFormatter.isFutureDate(activePassExpiry);
   }
 }

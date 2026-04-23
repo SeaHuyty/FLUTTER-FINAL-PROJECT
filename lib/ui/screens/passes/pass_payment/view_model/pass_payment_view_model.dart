@@ -11,25 +11,20 @@ class PassPaymentViewModel extends ChangeNotifier {
   DateTime? _expiryDate;
   AsyncValue<void> purchaseState = AsyncValue.success(null);
 
-  PassModel? get pass => selectedPass;
-  DateTime? get expiryDate => _expiryDate;
-  bool get isSaving => purchaseState.state == AsyncValueState.loading;
-  bool get canPay => selectedPass != null;
-  String get noPassSelectedMessage => 'No pass selected';
-  String get payNowButtonText => 'Pay now';
+  
   String get expiryText {
-    final expiry = _expiryDate ?? _projectedExpiryDate;
+    final expiry = expiryDate ?? passExpiryDate;
     if (expiry == null) return 'N/A';
     return DateFormatter.formatPassExpiry(expiry);
   }
 
-  DateTime? get _projectedExpiryDate {
+  DateTime? get passExpiryDate {
     final pass = selectedPass;
     if (pass == null) return null;
     return DateTime.now().add(calculateDuration(pass.duration));
   }
 
-  Future<void> completePassPurchase(UserViewModel userViewModel) async {
+  Future<void> buyPass(UserViewModel userViewModel) async {
     final pass = selectedPass;
     if (pass == null) return;
 
@@ -49,6 +44,7 @@ class PassPaymentViewModel extends ChangeNotifier {
         );
         await userViewModel.updateUserProfile(updatedUser);
       }
+      
       purchaseState = AsyncValue.success(null);
     } catch (e) {
       purchaseState = AsyncValue.error(e);
@@ -58,22 +54,28 @@ class PassPaymentViewModel extends ChangeNotifier {
     }
   }
 
- Duration calculateDuration(String rawDuration) {
-  final parts = rawDuration.toLowerCase().split(' ');
+ Duration calculateDuration(String duration) {
+  final parts = duration.toLowerCase().split(' ');
   
   final int value = int.tryParse(parts[0]) ?? 1;
   
-    if (rawDuration.contains('year')) {
+    if (duration.contains('year')) {
     return Duration(days: value * 365);
 
-  } else if (rawDuration.contains('month')) {
+  } else if (duration.contains('month')) {
     return Duration(days: value * 30);
 
-  } else if (rawDuration.contains('week')) {
+  } else if (duration.contains('week')) {
     return Duration(days: value * 7);
 
   } else {
     return Duration(days: value);
   }
 }
+
+  PassModel? get pass => selectedPass;
+  DateTime? get expiryDate => _expiryDate;
+  bool get isSaving => purchaseState.state == AsyncValueState.loading;
+  bool get canPay => selectedPass != null;
+
 }

@@ -18,65 +18,61 @@ class PassSelectionContent extends StatefulWidget {
 }
 
 class _PassSelectionContentState extends State<PassSelectionContent> {
+
   @override
   void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+  super.initState();
 
-      final passVm = context.read<PassSelectionViewModel>();
-      passVm.fetchPasses();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    context.read<PassSelectionViewModel>().fetchPasses();
 
-      final userVm = context.read<UserViewModel>();
-      if (userVm.user == null && !userVm.isLoading) {
-        userVm.loadCurrentUser();
-      }
-    });
-  }
+    final userVm = context.read<UserViewModel>();
+    if (userVm.user == null) {
+      userVm.loadCurrentUser();
+    }
+  });
+}
 
-  void _goToPayment(BuildContext context) {
+  void goToPayment(BuildContext context) {
     final vm = context.read<PassSelectionViewModel>();
     final selectedPass = vm.selectedPass;
-    if (selectedPass == null) return;
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PassPaymentScreen(selectedPass: selectedPass),
+    if (selectedPass == null) {
+        return;
+    }
+    
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) => PassPaymentScreen(selectedPass: selectedPass),
       ),
     );
   }
 
-  void _onSelectPass(PassSelectionViewModel vm, PassModel pass) {
+  void onSelectPass(PassSelectionViewModel vm, PassModel pass) {
     vm.selectPass(pass);
   }
 
-  void _showRemovePassDialog(BuildContext context) {
+  void showRemovePassDialog(BuildContext context) {
     final userViewModel = context.read<UserViewModel>();
     final passSelectionViewModel = context.read<PassSelectionViewModel>();
     final messenger = ScaffoldMessenger.of(context);
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(passSelectionViewModel.removePassDialogTitle),
-        content: Text(passSelectionViewModel.removePassDialogContent),
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Pass'),
+        content: const Text('Are you sure you want to remove your active pass?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(dialogContext);
+              Navigator.pop(context);
               await userViewModel.removeActivePass();
 
-              if (!mounted) return;
               passSelectionViewModel.clearSelection();
               messenger.showSnackBar(
-                SnackBar(
-                  content: Text(passSelectionViewModel.removePassSuccessMessage),
-                ),
+                const SnackBar(content: Text('Pass removed successfully')),
               );
             },
             child: const Text('Remove', style: TextStyle(color: Colors.red)),
@@ -86,9 +82,7 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
     );
   }
 
-  Widget _buildActivePassBanner() {
-    final vm = context.read<PassSelectionViewModel>();
-
+  Widget activePassBanner() {
     return Container(
       width: double.infinity,
       height: 60,
@@ -103,7 +97,7 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              vm.activePassBannerMessage,
+              'You already have an active pass. You cannot purchase a new one until it expires.',
               style: const TextStyle(color: Colors.white),
             ),
           ),
@@ -112,7 +106,7 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
     );
   }
   
-  Widget _buildPassSelectionList(PassSelectionViewModel vm) {
+  Widget passSelectionCard(PassSelectionViewModel vm) {
     final passes = vm.passes.data ?? [];
 
     return Stack(
@@ -130,7 +124,7 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
                 description: 'Valid for ${pass.duration}',
                 icon: Icons.calendar_today_outlined,
                 isSelected: vm.selectedPass?.id == pass.id,
-                onTap: () => _onSelectPass(vm, pass),
+                onTap: () => onSelectPass(vm, pass),
               ),
             );
           },
@@ -140,8 +134,8 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
           left: 16,
           right: 16,
           child: VeloButton(
-            text: vm.continueToPaymentText,
-            onPressed: vm.selectedPass == null ? null : () => _goToPayment(context),
+            text: 'Continue to Payment',
+            onPressed: vm.selectedPass == null ? null : () => goToPayment(context),
           ),
         ),
       ],
@@ -171,11 +165,11 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 24),
           child: Column(
             children: [
-              _buildActivePassBanner(),
+              activePassBanner(),
               const SizedBox(height: 50),
               ActivePassTile(
                 user: user,
-                onRemove: () => _showRemovePassDialog(context),
+                onRemove: () => showRemovePassDialog(context),
               ),
             ],
           ),
@@ -185,8 +179,8 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
 
     final Widget body = switch (vm.passes.state) {
       AsyncValueState.loading => const Center(child: CircularProgressIndicator()),
-      AsyncValueState.error => Center(child: Text(vm.passesLoadErrorMessage)),
-      AsyncValueState.success => _buildPassSelectionList(vm),
+      AsyncValueState.error => const Center(child: Text('Error loading passes')),
+      AsyncValueState.success => passSelectionCard(vm),
     };
 
     return Scaffold(

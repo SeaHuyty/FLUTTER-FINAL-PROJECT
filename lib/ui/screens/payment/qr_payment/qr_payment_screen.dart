@@ -86,7 +86,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     if (selectedPass != null) {
       try {
-        await passPaymentViewModel!.completePassPurchase(
+        await passPaymentViewModel!.buyPass(
           context.read<UserViewModel>(),
         );
         _paymentError = null;

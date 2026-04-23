@@ -24,17 +24,11 @@ class PassBookingViewModel extends ChangeNotifier {
 
   AsyncValue<void> startRideState = AsyncValue.success(null);
 
-  bool get isStartingRide => startRideState.state == AsyncValueState.loading;
-  String get activePassMessage => 'Your Monthly Pass is active.';
-  String get startRideButtonText => 'Start Riding';
-  String get startRideErrorMessage => startRideState.error?.toString().trim().isNotEmpty == true? startRideState.error!.toString().trim()
-      : 'Could not unlock bike. Please try again.';
 
   Future<bool> startRide() async {
     if (isStartingRide) {
       return false;
     }
-
     startRideState = AsyncValue.loading();
     notifyListeners();
 
@@ -62,4 +56,6 @@ class PassBookingViewModel extends ChangeNotifier {
       return false;
     }
   }
+
+  bool get isStartingRide => startRideState.state == AsyncValueState.loading;
 }

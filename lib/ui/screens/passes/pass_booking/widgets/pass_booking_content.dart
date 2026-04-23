@@ -9,29 +9,25 @@ import 'package:velo_toulouse_redesign/ui/widgets/display/header/app_bar.dart';
 class PassBookingContent extends StatelessWidget {
 	const PassBookingContent({super.key});
 
-	Future<void> _onStartRide(BuildContext context, PassBookingViewModel vm) async {
+	Future<void> onStartRide(BuildContext context, PassBookingViewModel vm) async {
 		final started = await vm.startRide();
 
-		if (!context.mounted) {
-			return;
-		}
-
 		if (!started) {
+			final errorText = vm.startRideState.error?.toString().trim().isNotEmpty == true
+				? vm.startRideState.error!.toString().trim()
+				: 'Could not unlock bike. Please try again.';
 			ScaffoldMessenger.of(context).showSnackBar(
 				SnackBar(
-					content: Text(vm.startRideErrorMessage),
+					content: Text(errorText),
 				),
 			);
 			return;
 		}
 
-		Navigator.push(
-			context,
-			MaterialPageRoute(builder: (_) => const ActiveRideScreen()),
-		);
+		Navigator.push(context, MaterialPageRoute(builder: (_) => const ActiveRideScreen()));
 	}
 
-	Widget _buildActivePassCard(PassBookingViewModel vm) {
+	Widget activePassMessage(PassBookingViewModel vm) {
 		return Container(
 			width: double.infinity,
 			padding: const EdgeInsets.all(14),
@@ -46,7 +42,7 @@ class PassBookingContent extends StatelessWidget {
 					const SizedBox(width: 30),
 					Expanded(
 						child: Text(
-							vm.activePassMessage,
+							'Your Monthly Pass is active.',
 							style: const TextStyle(
 								color: Colors.blueGrey,
 								fontWeight: FontWeight.w600,
@@ -205,14 +201,14 @@ class PassBookingContent extends StatelessWidget {
 							),
 						),
 						const SizedBox(height: 50),
-						_buildActivePassCard(vm),
+						activePassMessage(vm),
 						const SizedBox(height: 70),
 						Center(
 							child: VeloButton(
-								text: vm.startRideButtonText,
+								text: 'Start Riding',
 								onPressed: vm.isStartingRide
 									? null
-									: () => _onStartRide(context, vm),
+									: () => onStartRide(context, vm),
 							),
 						),
 					],
