@@ -13,11 +13,16 @@ class PassBookingContent extends StatelessWidget {
 		final started = await vm.startRide();
 
 		if (!started) {
-			final errorText = vm.startRideState.error?.toString().trim().isNotEmpty == true
-				? vm.startRideState.error!.toString().trim()
-				: 'Could not unlock bike. Please try again.';
+			String errorText = 'Could not unlock bike. Please try again.';
+			final error = vm.startRideState.error;
+			if (error != null) {
+				final message = error.toString().trim();
+				if (message.isNotEmpty) {
+					errorText = message;
+				}
+			}
 
-      if (!context.mounted) return;
+			if (!context.mounted) return;
 			ScaffoldMessenger.of(context).showSnackBar(
 				SnackBar(
 					content: Text(errorText),

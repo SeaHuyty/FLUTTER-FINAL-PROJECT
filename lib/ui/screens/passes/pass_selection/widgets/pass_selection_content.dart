@@ -177,11 +177,18 @@ class _PassSelectionContentState extends State<PassSelectionContent> {
       );
     }
 
-    final Widget body = switch (vm.passes.state) {
-      AsyncValueState.loading => const Center(child: CircularProgressIndicator()),
-      AsyncValueState.error => const Center(child: Text('Error loading passes')),
-      AsyncValueState.success => passSelectionCard(vm),
-    };
+        final Widget body;
+    switch (vm.passes.state) {
+      case AsyncValueState.loading:
+        body = const Center(child: CircularProgressIndicator());
+        break;
+      case AsyncValueState.error:
+        body = const Center(child: Text('Error loading passes'));
+        break;
+      case AsyncValueState.success:
+        body = passSelectionCard(vm);
+        break;
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,

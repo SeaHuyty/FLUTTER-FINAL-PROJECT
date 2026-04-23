@@ -9,6 +9,8 @@ class PassSelectionViewModel extends ChangeNotifier {
 
   PassSelectionViewModel(this.repository);
 
+  AsyncValue<List<PassModel>> passes = AsyncValue.loading();
+
   Future<void> fetchPasses() async {
     passes = AsyncValue.loading();
     notifyListeners();
@@ -22,19 +24,18 @@ class PassSelectionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  AsyncValue<List<PassModel>> passes = AsyncValue.loading();
   PassModel? selectedPass;
 
   void selectPass(PassModel pass) {
     selectedPass = pass;
     notifyListeners();
   }
-
+  
   void clearSelection() {
     selectedPass = null;
     notifyListeners();
   }
-
+  
   bool hasActivePass(String? activePassExpiry) {
     return DateFormatter.isFutureDate(activePassExpiry);
   }
