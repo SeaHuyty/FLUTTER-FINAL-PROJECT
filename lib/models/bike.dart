@@ -12,4 +12,11 @@ class BikeModel {
       status: BikeStatus.values.byName(data['status'] as String),
     );
   }
+
+  static Map<String, dynamic> bikeToMap(BikeModel bike) {
+    return <String, dynamic>{
+      'plate_number': bike.plateNumber,
+      'status': bike.status.name,
+    };
+  }
 }

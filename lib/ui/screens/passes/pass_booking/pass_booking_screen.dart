@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
+import 'package:velo_toulouse_redesign/data/repositories/bikes/bike_repository.dart';
 import 'package:velo_toulouse_redesign/models/bike.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_booking/view_model/pass_booking_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_booking/widgets/pass_booking_content.dart';
@@ -24,7 +24,7 @@ class PassbookingScreen extends StatelessWidget {
 	Widget build(BuildContext context) {
 		return ChangeNotifierProvider(
 			create: (context) => PassBookingViewModel(
-				stationRepository: context.read<StationRepository>(),
+				bikeRepository: context.read<BikeRepository>(),
 				rideSessionProvider: context.read<RideSessionViewModel>(),
 				stationId: stationId,
 				stationName: stationName,

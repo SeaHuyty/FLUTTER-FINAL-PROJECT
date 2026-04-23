@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:velo_toulouse_redesign/ui/screens/map/view_model/bike_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/theme/theme.dart';
 import 'package:velo_toulouse_redesign/ui/utils/app_config.dart';
 import 'package:velo_toulouse_redesign/models/station.dart';
-import 'package:velo_toulouse_redesign/ui/screens/map/view_model/map_view_model.dart';
+import 'package:velo_toulouse_redesign/ui/screens/map/view_model/station_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/ride_history/view_model/ride_history_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/legend_pill.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/widgets/ride_bottom_sheet.dart';
@@ -67,7 +68,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
     if (rideSession == null || _returnStation == null) return;
 
     try {
-      await context.read<MapViewModel>().dockBike(
+      await context.read<BikeViewModel>().dockBike(
         stationId: _returnStation!.id,
         bikeNumber: rideSession.bikeNumber,
       );
@@ -95,7 +96,6 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
 
     if (!mounted) return;
     context.read<RideSessionViewModel>().clear();
-
 
     _timer.cancel();
     Navigator.of(context).popUntil((route) => route.isFirst);
@@ -197,14 +197,15 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
       );
     }
 
-    final stationViewModel = context.watch<MapViewModel>();
+    final stationViewModel = context.watch<StationViewModel>();
     final hasReturnStation = _returnStation != null;
 
     return Scaffold(
       body: Stack(
         children: [
           // ── Full screen map ───────────────────────────────────────
-          if (!stationViewModel.isLoading && stationViewModel.errorMessage == null)
+          if (!stationViewModel.isLoading &&
+              stationViewModel.errorMessage == null)
             Builder(
               builder: (_) {
                 final returnable = _returnableStations(

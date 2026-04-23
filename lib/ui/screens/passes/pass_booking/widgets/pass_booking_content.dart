@@ -16,6 +16,8 @@ class PassBookingContent extends StatelessWidget {
 			final errorText = vm.startRideState.error?.toString().trim().isNotEmpty == true
 				? vm.startRideState.error!.toString().trim()
 				: 'Could not unlock bike. Please try again.';
+
+      if (!context.mounted) return;
 			ScaffoldMessenger.of(context).showSnackBar(
 				SnackBar(
 					content: Text(errorText),
@@ -24,6 +26,7 @@ class PassBookingContent extends StatelessWidget {
 			return;
 		}
 
+    if (!context.mounted) return;
 		Navigator.push(context, MaterialPageRoute(builder: (_) => const ActiveRideScreen()));
 	}
 

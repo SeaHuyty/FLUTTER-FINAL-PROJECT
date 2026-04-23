@@ -7,8 +7,8 @@ import 'package:velo_toulouse_redesign/models/bike.dart';
 import 'package:velo_toulouse_redesign/models/station.dart';
 import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 
-class MapViewModel extends ChangeNotifier {
-  MapViewModel({StationRepository? repository})
+class StationViewModel extends ChangeNotifier {
+  StationViewModel({StationRepository? repository})
     : _repository = repository ?? StationRepositoryFirebase() {
     unawaited(fetchStations());
   }
@@ -42,25 +42,6 @@ class MapViewModel extends ChangeNotifier {
     }
 
     _safeNotify();
-  }
-
-  Future<void> checkoutBike({
-    required String stationId,
-    required String bikeNumber,
-  }) async {
-    await _repository.checkoutBike(
-      stationId: stationId,
-      bikeNumber: bikeNumber,
-    );
-    await fetchStations();
-  }
-
-  Future<void> dockBike({
-    required String stationId,
-    required String bikeNumber,
-  }) async {
-    await _repository.dockBike(stationId: stationId, bikeNumber: bikeNumber);
-    await fetchStations();
   }
 
   void setBike(BikeModel bike) {

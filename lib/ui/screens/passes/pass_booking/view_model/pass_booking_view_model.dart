@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
+import 'package:velo_toulouse_redesign/data/repositories/bikes/bike_repository.dart';
 import 'package:velo_toulouse_redesign/models/ride_session.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/models/bike.dart';
 import 'package:velo_toulouse_redesign/ui/utils/async_value.dart';
 
 class PassBookingViewModel extends ChangeNotifier {
-  final StationRepository stationRepository;
+  final BikeRepository bikeRepository;
   final RideSessionViewModel rideSessionProvider;
   final String stationId;
   final String stationName;
@@ -14,7 +14,7 @@ class PassBookingViewModel extends ChangeNotifier {
   final BikeModel bike;
 
   PassBookingViewModel({
-    required this.stationRepository,
+    required this.bikeRepository,
     required this.rideSessionProvider,
     required this.stationId,
     required this.stationName,
@@ -33,7 +33,7 @@ class PassBookingViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await stationRepository.checkoutBike(
+      await bikeRepository.checkoutBike(
         stationId: stationId,
         bikeNumber: bike.plateNumber,
       );

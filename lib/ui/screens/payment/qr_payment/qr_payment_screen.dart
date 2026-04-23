@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:velo_toulouse_redesign/data/repositories/stations/station_repository.dart';
+import 'package:velo_toulouse_redesign/ui/screens/map/view_model/bike_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/passes/pass_payment/view_model/pass_payment_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/ride/view_model/ride_session_view_model.dart';
 import 'package:velo_toulouse_redesign/ui/screens/user/user_profile/view_model/user_view_model.dart';
@@ -86,9 +86,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     if (selectedPass != null) {
       try {
-        await passPaymentViewModel!.buyPass(
-          context.read<UserViewModel>(),
-        );
+        await passPaymentViewModel!.buyPass(context.read<UserViewModel>());
         _paymentError = null;
         return true;
       } catch (_) {
@@ -104,7 +102,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
 
     try {
-      await context.read<StationRepository>().checkoutBike(
+      await context.read<BikeViewModel>().checkoutBike(
         stationId: currentRide!.fromStationId!,
         bikeNumber: currentRide.bikeNumber,
       );
